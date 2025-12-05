@@ -33,40 +33,49 @@
 
 
 
+#_________________________________________________________________________________________
+# MOHAMED KHALED -> da connection el database 
 
-# db_singleton.py
-import pyodbc
+# import pyodbc
 
-class DatabaseConnection:
-    _instance = None
+# class DatabaseConnection:
+#     _instance = None
+#     _connection = None
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(DatabaseConnection, cls).__new__(cls)
-        return cls._instance
+#     def __new__(cls):
+#         if cls._instance is None:
+#             cls._instance = super(DatabaseConnection, cls).__new__(cls)
+#         return cls._instance
 
-    def __init__(self):
-        # Ensure __init__ runs only once
-        if not hasattr(self, 'initialized'):
-            # 🔧 Configure your SQL Server connection string
-            self.connection_string = (
-                "DRIVER={ODBC Driver 17 for SQL Server};"  # or "ODBC Driver 18 for SQL Server"
-                "SERVER=localhost\\SQLEXPRESS;"                        # Use your server (e.g., localhost, .\\SQLEXPRESS)
-                "DATABASE=Clinic_Ease;"
-                "Trusted_Connection=yes;"                  # Windows Authentication (no password)
-                # 🔐 For SQL Server Authentication (username/password), use:
-                # "UID=sa;PWD=YourStrongPassword123;"
-            )
-            self.initialized = True
+#     def __init__(self):
+#         if not hasattr(self, 'initialized'): 
+#             self.connection_string = (
+#                 "DRIVER={ODBC Driver 17 for SQL Server};"
+#                 "SERVER=DESKTOP-8BOV2OD\\SQLEXPRESS;"
+#                 "DATABASE=clinicease;"
+#                 "Trusted_Connection=yes;"
+#             )
+#             self.initialized = True
 
-    def get_connection(self):
-        """
-        Returns a NEW connection to SQL Server.
-        ⚠️ Always close this connection after use (use try/finally or context manager).
-        """
-        try:
-            conn = pyodbc.connect(self.connection_string)
-            return conn
-        except Exception as e:
-            print("❌ ERROR connecting to SQL Server:", e)
-            raise
+#     def get_connection(self):
+        
+#         try:
+#             conn = pyodbc.connect(self.connection_string)
+#             print("✅ Successfully connected to SQL Server")
+#             return conn
+#         except pyodbc.Error as e:
+#             error_msg = f"Error connecting to SQL Server: {e}"
+#             print(error_msg)
+#             raise ConnectionError(f"Database connection failed: {e}") from e
+#         except Exception as e:
+#             print(f"Unexpected error connecting to SQL Server: {e}")
+#             raise
+
+#     def close_connection(self):
+        
+#         if self._connection:
+#             self._connection.close()
+#             self._connection = None
+#             print("Closed database connection")
+
+#_________________________________________________________________________________________

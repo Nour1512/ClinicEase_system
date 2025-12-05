@@ -1,13 +1,11 @@
-// ---- ROLE coming from Flask / HTML ----
-const CURRENT_ROLE = window.CURRENT_ROLE || "user"; // "admin" or "user"
+const CURRENT_ROLE = window.CURRENT_ROLE || "user";
 
-// JS model equivalent of your Python Pharmacy class
 class Pharmacy {
-    constructor(Medicine_id, MedicineName, Quantity, Price, ExpiryDate, supplier) {
+    constructor(Medicine_id, MedicineName, Quantity, price, ExpiryDate, supplier) {
         this.Medicine_id = Medicine_id;
         this.MedicineName = MedicineName;
         this.Quantity = Quantity;
-        this.Price = Price;
+        this.price = price;
         this.ExpiryDate = new Date(ExpiryDate);
         this.supplier = supplier;
     }
@@ -17,7 +15,7 @@ class Pharmacy {
             data.Medicine_id,
             data.MedicineName,
             data.Quantity,
-            data.Price,
+            data.price,
             data.ExpiryDate,
             data.supplier
         );
@@ -43,7 +41,6 @@ class Pharmacy {
     }
 }
 
-// DOM references
 const gridEl = document.getElementById("medicineGrid");
 const searchInput = document.getElementById("searchInput");
 const supplierFilter = document.getElementById("supplierFilter");
@@ -55,7 +52,6 @@ const filterSummary = document.getElementById("filterSummary");
 const toast = document.getElementById("toast");
 const toastMessage = document.getElementById("toastMessage");
 
-// API URLs (placeholders __ID__ are replaced when used)
 const API_LIST_URL = gridEl.dataset.apiUrl;
 const API_BUY_URL_TEMPLATE = gridEl.dataset.apiBuyUrl;
 const API_RESTOCK_URL_TEMPLATE = gridEl.dataset.apiRestockUrl;
@@ -63,23 +59,46 @@ const API_DELETE_URL_TEMPLATE = gridEl.dataset.apiDeleteUrl;
 
 let medicines = [];
 
-// ---------- LOADING DATA FROM FLASK ----------
-
 async function loadMedicines() {
     try {
+        if (!API_LIST_URL || API_LIST_URL === 'undefined') {
+            console.error("API_LIST_URL is not defined");
+            showToast("Configuration error: API URL not set. Please refresh the page.");
+            return;
+        }
+        
         const res = await fetch(API_LIST_URL);
+        
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({ error: `HTTP ${res.status}: ${res.statusText}` }));
+            throw new Error(errorData.error || `Server error: ${res.status}`);
+        }
+        
         const data = await res.json();
-        medicines = data.map(Pharmacy.from_dict);
-
-        renderSuppliersFilter();
-        renderGrid();
+        
+        if (Array.isArray(data)) {
+            medicines = data.map(Pharmacy.from_dict);
+            renderSuppliersFilter();
+            renderGrid();
+        } else if (data.error) {
+            throw new Error(data.error);
+        } else {
+            throw new Error("Invalid response format from server");
+        }
     } catch (err) {
-        console.error(err);
-        showToast("Failed to load medicines from server.");
+        console.error("Error loading medicines:", err);
+        const errorMsg = err.message || "Failed to load medicines from server. Please check your database connection.";
+        showToast(errorMsg);
+        
+        // Show empty state
+        if (gridEl) {
+            gridEl.innerHTML = `<div style="text-align: center; padding: 2rem; color: #dc2626;">
+                <p><strong>Error loading medicines</strong></p>
+                <p style="font-size: 0.9em; margin-top: 0.5rem;">${errorMsg}</p>
+            </div>`;
+        }
     }
 }
-
-// ---------- RENDERING ----------
 
 function renderSuppliersFilter() {
     supplierFilter.innerHTML = '<option value="">All Suppliers</option>';
@@ -122,9 +141,9 @@ function filteredAndSortedMedicines() {
             case "name-desc":
                 return b.MedicineName.localeCompare(a.MedicineName);
             case "price-asc":
-                return a.Price - b.Price;
+                return a.price - b.price;
             case "price-desc":
-                return b.Price - a.Price;
+                return b.price - a.price;
             case "quantity-asc":
                 return a.Quantity - b.Quantity;
             case "quantity-desc":
@@ -179,7 +198,6 @@ function renderGrid() {
         const expiryDateStr = med.ExpiryDate.toLocaleDateString();
         const initialLetter = med.MedicineName.charAt(0).toUpperCase();
 
-        // Role-based action buttons
         let actionsHtml = "";
         if (CURRENT_ROLE === "admin") {
             actionsHtml = `
@@ -209,7 +227,7 @@ function renderGrid() {
 
             <div class="medicine-meta">
                 <span>Qty: <strong>${med.Quantity}</strong></span>
-                <span>Price: <strong>\\$${med.Price.toFixed(2)}</strong></span>
+                <span>Price: <strong>$${med.price.toFixed(2)}</strong></span>
             </div>
 
             <div class="medicine-footer">
@@ -222,9 +240,9 @@ function renderGrid() {
                 </div>
             </div>
 
-            <div class="medicine-meta" style="margin-top:4px;">
+            <div class="medicine-meta" style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(229, 231, 235, 0.6);">
                 <span>Expiry: <strong>${expiryDateStr}</strong></span>
-                <span>${expiryLabel}</span>
+                <span style="padding: 2px 8px; border-radius: 999px; background: ${med.isExpired() ? '#fee2e2' : med.isNearExpiry() ? '#fef3c7' : '#dcfce7'}; color: ${med.isExpired() ? '#b91c1c' : med.isNearExpiry() ? '#d97706' : '#15803d'}; font-size: 11px;">${expiryLabel}</span>
             </div>
         `;
 
@@ -255,8 +273,6 @@ function buildFilterSummary(currentCount) {
 
     return `Showing ${currentCount} medicine${currentCount !== 1 ? "s" : ""} ${parts.join(", ")}`;
 }
-
-// ---------- ACTIONS (respect role and call Flask API) ----------
 
 async function onCardActionClick(e) {
     e.stopPropagation();
@@ -326,8 +342,6 @@ async function onCardActionClick(e) {
     }
 }
 
-// ---------- TOAST ----------
-
 let toastTimeout;
 function showToast(message) {
     toastMessage.textContent = message;
@@ -340,8 +354,6 @@ function showToast(message) {
         toast.classList.add("hidden");
     }, 3500);
 }
-
-// ---------- INITIALISATION ----------
 
 function init() {
     loadMedicines();
@@ -357,12 +369,88 @@ function init() {
     });
 
     const newMedBtn = document.getElementById("newMedicineBtn");
-    newMedBtn?.addEventListener("click", () => {
-        if (CURRENT_ROLE !== "admin") {
-            showToast("Only admins can add new medicines.");
-            return;
+    const modal = document.getElementById("newMedicineModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const newMedicineForm = document.getElementById("newMedicineForm");
+
+    function openModal() {
+        modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+        
+        const expiryDateInput = document.getElementById("expiryDate");
+        if (expiryDateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            expiryDateInput.setAttribute('min', today);
         }
-        showToast("New Medicine form not implemented yet – connect this to your Flask route.");
+    }
+
+    function closeModal() {
+        modal.classList.add("hidden");
+        document.body.style.overflow = "";
+        newMedicineForm.reset();
+    }
+
+    newMedBtn?.addEventListener("click", openModal);
+    closeModalBtn?.addEventListener("click", closeModal);
+    cancelBtn?.addEventListener("click", closeModal);
+
+    modal?.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+            closeModal();
+        }
+    });
+
+    newMedicineForm?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = newMedicineForm.querySelector(".btn-submit");
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Adding...";
+
+        try {
+            const formData = new FormData(newMedicineForm);
+            
+            const medicineData = {
+                MedicineName: formData.get("MedicineName"),
+                Quantity: parseInt(formData.get("Quantity")),
+                price: parseFloat(formData.get("price")),
+                ExpiryDate: formData.get("ExpiryDate"),
+                supplier: formData.get("supplier")
+            };
+
+            const res = await fetch("/pharmacy/api/medicines", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(medicineData)
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.ok) {
+                throw new Error(data.error || "Failed to add medicine");
+            }
+
+            showToast(`Successfully added ${medicineData.MedicineName}!`);
+            closeModal();
+            
+            await loadMedicines();
+        } catch (err) {
+            console.error("Error adding medicine:", err);
+            showToast(err.message || "Failed to add medicine. Please try again.");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
     });
 }
 

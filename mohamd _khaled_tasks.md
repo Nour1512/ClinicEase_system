@@ -19,3 +19,15 @@ How:
 
 
 
+
+
+
+# NEXT STEPS
+
+
+- hatget el role bta3t el signed in user (Admin, patient, doctor)
+- css hthandle en elbutton bta3 new medicine yb2a -hidden law el role dy msh admin 
+- elbuy button lazm yb2a button flba2y wyb2a bardo hidden law el role dy msh patient (patient only should buy medicine)
+- el buy api m3mol already hatintegrate elbuy da bas m3 el html w tcall el method bta3to, momkn tzwd counter quantity flfrontend ashan el patient ykhtar awez yshtry ad eh mn elmedicine da 
+- hattest el database b3d kol method tzwdha wtt2kd enha bttghyr m3 kol update (Add medicina, buy, get)
+

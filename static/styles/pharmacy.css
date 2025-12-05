@@ -30,14 +30,12 @@ body {
     color: var(--text-main);
 }
 
-/* Layout */
 .app-shell {
     display: grid;
     grid-template-columns: 260px minmax(0, 1fr);
     min-height: 100vh;
 }
 
-/* Sidebar */
 .sidebar {
     background: linear-gradient(180deg, #020617 0%, #0b1437 60%, #020617 100%);
     color: #e5e7eb;
@@ -143,7 +141,6 @@ body {
     font-weight: 600;
 }
 
-/* Main layout */
 .main {
     display: flex;
     flex-direction: column;
@@ -151,7 +148,6 @@ body {
     gap: 18px;
 }
 
-/* Top bar */
 .topbar {
     display: flex;
     align-items: center;
@@ -266,7 +262,6 @@ body {
     font-weight: 600;
 }
 
-/* Header row */
 .page-header {
     display: flex;
     align-items: center;
@@ -340,7 +335,6 @@ body {
     filter: brightness(1.02);
 }
 
-/* Content card */
 .content-card {
     border-radius: var(--radius-lg);
     background: #ffffff;
@@ -407,7 +401,6 @@ body {
     background: var(--success);
 }
 
-/* Grid */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -415,20 +408,29 @@ body {
     padding-top: 4px;
 }
 
-/* Medicine cards */
+.medicine-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+    padding-top: 4px;
+}
+
 .medicine-card {
     border-radius: var(--radius-md);
     background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
     border: 1px solid rgba(229, 231, 235, 0.9);
-    padding: 10px 11px 11px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 10px;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     transition: transform 0.18s ease-out, box-shadow 0.18s ease-out,
         border-color 0.18s ease-out, background 0.18s ease-out;
+    aspect-ratio: 1;
+    min-height: 280px;
+    justify-content: space-between;
 }
 
 .medicine-card::before {
@@ -454,32 +456,37 @@ body {
 .medicine-card-header {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
+    flex: 1;
 }
 
 .medicine-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
     background: radial-gradient(circle at 20% 0%, #a5b4fc, #4f46e5 50%, #1e293b 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #e5e7eb;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 600;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .medicine-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-main);
+    line-height: 1.3;
+    margin-bottom: 4px;
 }
 
 .medicine-subtitle {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-muted);
+    line-height: 1.4;
 }
 
 .badge-id {
@@ -493,36 +500,43 @@ body {
     color: #4b5563;
 }
 
-/* Meta row */
 .medicine-meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
+    padding: 8px 0;
+    border-top: 1px solid rgba(229, 231, 235, 0.6);
+    margin-top: auto;
 }
 
 .medicine-meta strong {
     color: var(--text-main);
+    font-size: 14px;
+    font-weight: 600;
 }
 
-/* Footer row */
 .medicine-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 4px;
-    font-size: 11px;
+    margin-top: 8px;
+    font-size: 12px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(229, 231, 235, 0.6);
 }
 
 .stock-status {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 2px 7px;
+    gap: 5px;
+    padding: 4px 10px;
     border-radius: 999px;
     background: #f3f4f6;
     color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
 }
 
 .stock-status span.dot {
@@ -530,7 +544,6 @@ body {
     height: 7px;
 }
 
-/* Stock colors */
 .stock-healthy .dot {
     background: var(--success);
 }
@@ -543,7 +556,6 @@ body {
     background: var(--danger);
 }
 
-/* Actions */
 .card-actions {
     display: inline-flex;
     gap: 6px;
@@ -574,7 +586,6 @@ body {
     background: #fecaca;
 }
 
-/* Buy button styling for user role */
 .btn-mini.buy {
     background: #dcfce7;
     color: #15803d;
@@ -584,7 +595,6 @@ body {
     background: #bbf7d0;
 }
 
-/* Toast notification */
 .toast {
     position: fixed;
     right: 20px;
@@ -615,7 +625,6 @@ body {
     transform: translateY(15px);
 }
 
-/* Responsive */
 @media (max-width: 900px) {
     .app-shell {
         grid-template-columns: 70px minmax(0, 1fr);
@@ -654,5 +663,210 @@ body {
 
     .topbar-actions {
         justify-content: flex-end;
+    }
+
+    .medicine-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 14px;
+    }
+
+    .medicine-card {
+        min-height: 240px;
+    }
+}
+
+@media (max-width: 480px) {
+    .medicine-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .medicine-card {
+        min-height: 280px;
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.2s ease-out;
+    padding: 20px;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-container {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 25px 50px rgba(15, 23, 42, 0.5);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(1);
+    transition: transform 0.2s ease-out;
+}
+
+.modal-overlay.hidden .modal-container {
+    transform: scale(0.95);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: var(--text-muted);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.15s ease-out, color 0.15s ease-out;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+    color: var(--text-main);
+}
+
+.modal-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.form-group label .required {
+    color: var(--danger);
+    margin-left: 2px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-main);
+    background: #ffffff;
+    transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #9ca3af;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 8px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-soft);
+}
+
+.btn-cancel,
+.btn-submit {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+    border: none;
+}
+
+.btn-cancel {
+    background: #f3f4f6;
+    color: var(--text-main);
+}
+
+.btn-cancel:hover {
+    background: #e5e7eb;
+}
+
+.btn-submit {
+    background: linear-gradient(125deg, #4f46e5, #6366f1);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@media (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-container {
+        max-width: 100%;
+        margin: 10px;
     }
 }

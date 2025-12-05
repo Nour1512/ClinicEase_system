@@ -77,6 +77,8 @@ app.oauth = oauth
 
 # Register blueprints
 app.register_blueprint(auth_bp)
+from controllers.pharamcy_controler import pharmacy_bp
+app.register_blueprint(pharmacy_bp)
 
 # Home redirect
 @app.route("/")
