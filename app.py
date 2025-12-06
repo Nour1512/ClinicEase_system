@@ -18,10 +18,12 @@
 
 
 from flask import Flask, redirect
+from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import os
 from authlib.integrations.flask_client import OAuth
 from controllers.auth_controller import auth_bp
+from controllers.reset_pass_controller import password_reset_bp
 # from repositories.patient_repository import init_db
 
 # Load environment variables
@@ -72,11 +74,25 @@ oauth.register(
     client_kwargs={'scope': 'r_liteprofile r_emailaddress'}
 )
 
+
+# Email setup
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv("EMAIL_USER")
+app.config['MAIL_PASSWORD'] = os.getenv("EMAIL_APP_PASSWORD")
+mail = Mail(app)  # Make mail available globally
+
+
+
 # Make OAuth available inside other files
 app.oauth = oauth
 
 # Register blueprints
 app.register_blueprint(auth_bp)
+app.register_blueprint(password_reset_bp)
+from controllers.pharamcy_controler import pharmacy_bp
+app.register_blueprint(pharmacy_bp)
 
 # Home redirect
 @app.route("/")
