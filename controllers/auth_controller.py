@@ -81,23 +81,23 @@ def signup():
 
 # Add these to your auth_bp (or a new dashboard blueprint)
 
-@auth_bp.route("/patient/dashboard")
-def patient_dashboard():
-    if session.get("role") != "patient":
-        return redirect("/login")
-    return render_template("patient/dashboard.html", name=session.get("name"))
+# @auth_bp.route("/patient/dashboard")
+# def patient_dashboard():
+#     if session.get("role") != "patient":
+#         return redirect("/login")
+#     return render_template("patient/dashboard.html", name=session.get("name"))
 
-@auth_bp.route("/doctor/dashboard")
-def doctor_dashboard():
-    if session.get("role") != "doctor":
-        return redirect("/login")
-    return render_template("doctor/dashboard.html", name=session.get("name"))
+# @auth_bp.route("/doctor/dashboard")
+# def doctor_dashboard():
+#     if session.get("role") != "doctor":
+#         return redirect("/login")
+#     return render_template("doctor/dashboard.html", name=session.get("name"))
 
-@auth_bp.route("/admin/dashboard")
-def admin_dashboard():
-    if session.get("role") != "admin":
-        return redirect("/login")
-    return render_template("admin/dashboard.html", name=session.get("name"))
+# @auth_bp.route("/admin/dashboard")
+# def admin_dashboard():
+#     if session.get("role") != "admin":
+#         return redirect("/login")
+#     return render_template("admin/dashboard.html", name=session.get("name"))
 
 
 
@@ -116,7 +116,7 @@ def dashboard():
     
     role = session.get("role")
     if role == "patient":
-        return render_template("patient/dashboard.html", name=session["name"])
+        return render_template("pharmacy/pharmacy.html", name=session["name"])
     elif role == "doctor":
         return render_template("doctor/dashboard.html", name=session["name"])
     elif role == "admin":

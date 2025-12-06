@@ -1,5 +1,5 @@
 from core.db_singleton import DatabaseConnection
-from models.Pharmacy import   Pharmacy
+from models.pharmacy import Pharmacy
 class PharmacyRepository:
     def get_medicine_by_ID(self, Medicine_ID):
         db = None

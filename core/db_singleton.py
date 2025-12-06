@@ -36,46 +36,46 @@
 #_________________________________________________________________________________________
 # MOHAMED KHALED -> da connection el database 
 
-# import pyodbc
+import pyodbc
 
-# class DatabaseConnection:
-#     _instance = None
-#     _connection = None
+class DatabaseConnection:
+    _instance = None
+    _connection = None
 
-#     def __new__(cls):
-#         if cls._instance is None:
-#             cls._instance = super(DatabaseConnection, cls).__new__(cls)
-#         return cls._instance
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(DatabaseConnection, cls).__new__(cls)
+        return cls._instance
 
-#     def __init__(self):
-#         if not hasattr(self, 'initialized'): 
-#             self.connection_string = (
-#                 "DRIVER={ODBC Driver 17 for SQL Server};"
-#                 "SERVER=DESKTOP-8BOV2OD\\SQLEXPRESS;"
-#                 "DATABASE=clinicease;"
-#                 "Trusted_Connection=yes;"
-#             )
-#             self.initialized = True
+    def __init__(self):
+        if not hasattr(self, 'initialized'): 
+            self.connection_string = (
+                "DRIVER={ODBC Driver 17 for SQL Server};"
+                "SERVER=localhost\\SQLEXPRESS;"
+                "DATABASE=Clinic_Ease;"
+                "Trusted_Connection=yes;"
+            )
+            self.initialized = True
 
-#     def get_connection(self):
+    def get_connection(self):
         
-#         try:
-#             conn = pyodbc.connect(self.connection_string)
-#             print("✅ Successfully connected to SQL Server")
-#             return conn
-#         except pyodbc.Error as e:
-#             error_msg = f"Error connecting to SQL Server: {e}"
-#             print(error_msg)
-#             raise ConnectionError(f"Database connection failed: {e}") from e
-#         except Exception as e:
-#             print(f"Unexpected error connecting to SQL Server: {e}")
-#             raise
+        try:
+            conn = pyodbc.connect(self.connection_string)
+            print("✅ Successfully connected to SQL Server")
+            return conn
+        except pyodbc.Error as e:
+            error_msg = f"Error connecting to SQL Server: {e}"
+            print(error_msg)
+            raise ConnectionError(f"Database connection failed: {e}") from e
+        except Exception as e:
+            print(f"Unexpected error connecting to SQL Server: {e}")
+            raise
 
-#     def close_connection(self):
+    def close_connection(self):
         
-#         if self._connection:
-#             self._connection.close()
-#             self._connection = None
-#             print("Closed database connection")
+        if self._connection:
+            self._connection.close()
+            self._connection = None
+            print("Closed database connection")
 
 #_________________________________________________________________________________________
