@@ -23,3 +23,16 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 5000); // Wait 5 seconds
     }
   });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const alert = document.getElementById('flash-alert');
+    if (alert) {
+      // Hide after 5 seconds (5000 ms)
+      setTimeout(() => {
+        alert.style.opacity = '0';
+        alert.style.transition = 'opacity 0.5s ease';
+        // Remove from DOM after fade-out
+        setTimeout(() => alert.remove(), 500);
+      }, 5000);
+    }
+  });
