@@ -24,6 +24,7 @@ import os
 from authlib.integrations.flask_client import OAuth
 from controllers.reset_pass_controller import password_reset_bp
 from controllers.auth_controller import auth_bp
+from controllers.settings_controler import settings_bp
 # from repositories.patient_repository import init_db
 
 # Load environment variables
@@ -88,6 +89,7 @@ mail = Mail(app)  # Make mail available globally
 app.oauth = oauth
 
 # Register blueprints
+app.register_blueprint(settings_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(password_reset_bp)
 from controllers.pharamcy_controler import pharmacy_bp

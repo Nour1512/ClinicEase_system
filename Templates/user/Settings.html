@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Correct CSS Path -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/settings.css') }}">
+
+    <!-- Correct JS Path -->
+    <script src="{{ url_for('static', filename='scripts/settings.js') }}" defer></script>
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2 class="logo">finpay</h2>
+            <ul>
+                <li>Dashboard</li>
+                <li>Fund wallet</li>
+                <li>Cards & Bank</li>
+                <li>Transactions</li>
+                <li>Notifications</li>
+                <li class="active">Settings</li>
+                <li>Log out</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+
+            <!-- Top Bar -->
+            <div class="topbar">
+                <input type="text" placeholder="Search...">
+                <div class="profile-info">
+                    <img src="profile.jpg" alt="">
+                    <span>Michael Nelson</span>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="settings-card">
+                <h2>Account Settings</h2>
+
+                <div class="profile-section">
+                    <img src="profile.jpg" id="profileImage" class="profile-img">
+                    <button class="upload-btn" onclick="document.getElementById('uploadInput').click()">Upload New</button>
+                    <input type="file" id="uploadInput" accept="image/*" style="display:none">
+                </div>
+
+                <form id="settingsForm">
+
+                    <div class="row">
+                        <div class="field">
+                            <label>First Name</label>
+                            <input type="text" placeholder="Enter First Name">
+                        </div>
+
+                        <div class="field">
+                            <label>Last Name</label>
+                            <input type="text" placeholder="Enter Last Name">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="field">
+                            <label>Email</label>
+                            <input type="email" placeholder="example@gmail.com">
+                        </div>
+
+                        <div class="field">
+                            <label>Mobile Number</label>
+                            <input type="tel" placeholder="+234 123 456 7890">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="field">
+                            <label>Gender</label>
+                            <select>
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>ID Country</label>
+                            <select>
+                                <option>Nigeria</option>
+                                <option>Egypt</option>
+                                <option>USA</option>
+                                <option>UK</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="field full">
+                            <label>Residential Address</label>
+                            <input type="text" placeholder="Enter Address">
+                        </div>
+                    </div>
+
+                    <button type="button" class="save-btn" onclick="saveChanges()">Save Changes</button>
+
+                </form>
+            </div>
+
+        </main>
+
+    </div>
+
+
+
+</body>
+</html>
