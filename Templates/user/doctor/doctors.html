@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctors - Preclinic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/doctors.css') }}">
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="clinic-logo">P</div>
+                <div class="clinic-name">
+                    <h2>Preclinic</h2>
+                    <p>Healthcare System</p>
+                </div>
+            </div>
+            
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/doctors" class="nav-link active">
+                        <span class="nav-icon">👨‍⚕</span>
+                        <span>Doctors</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pharmacy" class="nav-link">
+                        <span class="nav-icon">💊</span>
+                        <span>Pharmacy</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">📅</span>
+                        <span>Appointments</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">🏥</span>
+                        <span>Patients</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">⚙</span>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <p>© 2025 Preclinic System</p>
+                <p>Version 2.1.0</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div></div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ name[0] if name else 'U' }}
+                    </div>
+                    <div class="user-details">
+                        <h3>{{ name if name else 'User' }}</h3>
+                        <p>Patient Portal</p>
+                    </div>
+                    <a href="/logout" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <header class="page-header">
+                <h1 class="page-title">Doctors</h1>
+                <div class="clinic-info">
+                    <span class="clinic-name-badge">
+                        <i class="fas fa-hospital"></i>
+                        Trucare Clinic
+                    </span>
+                    <span class="location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Latvegas
+                    </span>
+                </div>
+            </header>
+
+            <div class="grid-header">
+                <div class="search-filter-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search doctors by name or specialty...">
+                        </div>
+                        <div class="filter-options">
+                            <select id="specialtyFilter" class="filter-select">
+                                <option value="all">All Specialties</option>
+                                <option value="cardiologist">Cardiologist</option>
+                                <option value="surgeon">Surgeon</option>
+                                <option value="pediatrician">Pediatrician</option>
+                                <option value="gynecologist">Gynecologist</option>
+                                <option value="psychiatrist">Psychiatrist</option>
+                            </select>
+                            <select id="sortBy" class="filter-select">
+                                <option value="name">Sort by Name</option>
+                                <option value="price-low">Price: Low to High</option>
+                                <option value="price-high">Price: High to Low</option>
+                                <option value="rating">Highest Rated</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="total-doctors">
+                        <strong id="totalDoctors">{{ total_doctors }}</strong> doctors available
+                    </div>
+                </div>
+                <div>
+                    <h2 class="grid-title">Doctor Grid</h2>
+                    <p class="total-doctors">Total Doctors: <strong id="totalDoctorsCount">{{ total_doctors }}</strong></p>
+                </div>
+            </div>
+
+            <div class="doctor-grid" id="doctorsGrid">
+                {% if doctors %}
+                    {% for doctor_data in doctors %}
+                    {% set doctor = doctor_data.doctor %}
+                    <div class="doctor-card">
+                        <div class="doctor-header">
+                            <div class="doctor-avatar">
+                                {{ doctor.full_name.split(' ')[0][0] }}{{ doctor.full_name.split(' ')[-1][0] if doctor.full_name.split(' ')|length > 1 else doctor.full_name[1] }}
+                            </div>
+                            <div class="doctor-info">
+                                <h3 class="doctor-name">Dr. {{ doctor.full_name }}</h3>
+                                <p class="doctor-specialty">{{ doctor.specialty or 'General Practitioner' }}</p>
+                            </div>
+                            <div class="doctor-badge">Available</div>
+                        </div>
+                        
+                        <div class="doctor-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Available:</span>
+                                <span class="detail-value availability">{{ doctor_data.availability }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Starts From:</span>
+                                <span class="detail-value price">${{ doctor_data.price }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Rating:</span>
+                                <span class="detail-value">
+                                    {% set rating = doctor_data.rating or 4.5 %}
+                                    {% for i in range(5) %}
+                                        {% if i < rating|int %}&#9733;{% else %}&#9734;{% endif %}
+                                    {% endfor %}
+                                    ({{ rating }})
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <button class="book-btn" data-id="{{ doctor.doctor_id }}">
+                                Book Appointment
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                        <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">👨‍⚕</div>
+                        <h3 style="margin-bottom: 10px; color: #374151;">No doctors found</h3>
+                        <p style="color: #6b7280;">Please check back later or contact support.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <footer class="page-footer">
+                <p>© 2025 Trucare Clinic, Latvegas. All rights reserved.</p>
+                <p>For emergencies, call: +1 (555) 123-HELP (4357)</p>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts/doctors.js') }}"></script>
+    
+    <style>
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            min-width: 300px;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+            background: transparent;
+        }
+        
+        .search-box i {
+            color: #6b7280;
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            color: #374151;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #3594A9;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</body>
+</html>

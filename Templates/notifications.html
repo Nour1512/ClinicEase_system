@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Strategy - Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h1>Predictive</h1>
+            <p class="subtitle">Strategy Module</p>
+        </div>
+        
+        <nav class="nav-menu">
+            <div class="nav-section">
+                <h3>Main Work</h3>
+                <ul class="nav-links">
+                    <li>
+                        <label class="nav-item">
+                            <input type="checkbox" disabled>
+                            <span class="checkmark"></span>
+                            <span class="nav-text">Disabled</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="nav-item">
+                            <input type="checkbox" checked>
+                            <span class="checkmark"></span>
+                            <span class="nav-text">Missions</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="info-card">
+                    <h3>Notification Grid</h3>
+                    <div class="info-detail">
+                        <span class="info-label">Unread messages:</span>
+                        <span class="info-value" id="unreadCount">12</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="info-card">
+                    <h3>Strategies</h3>
+                    <div class="info-detail">
+                        <span class="info-text">Pension all machines</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Notification Filters -->
+            <div class="nav-section">
+                <h3>Filter By</h3>
+                <ul class="nav-links filter-links">
+                    <li>
+                        <label class="nav-item">
+                            <input type="checkbox" checked>
+                            <span class="checkmark"></span>
+                            <span class="nav-text">All Notifications</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="nav-item">
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                            <span class="nav-text">System Alerts</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="nav-item">
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                            <span class="nav-text">User Messages</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="nav-item">
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                            <span class="nav-text">Updates</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="activity-windows">
+                <p>Activity Windows</p>
+                <p class="small-text">Go to Settings to activate Windows.</p>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <h2>System Notifications</h2>
+                <div class="header-stats">
+                    <div class="stat">
+                        <span class="stat-label">Total:</span>
+                        <span class="stat-value" id="totalNotifications">24</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Unread:</span>
+                        <span class="stat-value" id="headerUnread">12</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Today:</span>
+                        <span class="stat-value">3</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search notifications..." id="searchInput">
+                </div>
+                <button class="btn-primary" id="markAllReadBtn">
+                    <i class="fas fa-check-double"></i>
+                    Mark All Read
+                </button>
+                <div class="user-info">
+                    <div class="user-avatar">N</div>
+                    <span class="user-name">Notification Admin</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Notification Grid -->
+        <div class="notification-grid" id="notificationGrid">
+            <!-- Notification cards will be dynamically loaded here -->
+        </div>
+        
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-left">
+                <p class="copyright">&copy; 2025 Predictive Strategy Module. All rights reserved.</p>
+                <p class="version">Version 2.5.1 | Last updated: 12/7/2023</p>
+            </div>
+            <div class="footer-right">
+                <button class="btn-secondary" id="exportBtn">
+                    <i class="fas fa-download"></i>
+                    Export Logs
+                </button>
+                <button class="btn-secondary" id="clearAllBtn">
+                    <i class="fas fa-trash-alt"></i>
+                    Clear All
+                </button>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Notification Detail Modal -->
+    <div class="modal" id="notificationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Notification Details</h3>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Notification details will appear here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="markAsReadBtn">Mark as Read</button>
+                <button class="btn-primary" id="closeModalBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
