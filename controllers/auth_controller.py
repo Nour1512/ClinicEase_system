@@ -54,7 +54,7 @@ def login():
             #     return redirect("/doctor/dashboard")
             # elif role == "admin":
             #     return redirect("/admin/dashboard")
-            return redirect("/dashboard")
+            return render_template("user/Settings.html")
         # user = patient_repo.get_patient_by_email(email)
         # if user and user.password == password:
         #     session["user_id"] = user.patient_id
@@ -62,7 +62,7 @@ def login():
         #     return redirect("/dashboard")
         else:
             return "Invalid email or password", 401
-    return render_template("login.html")
+    return render_template("user/login.html")
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():

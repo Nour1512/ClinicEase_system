@@ -8,7 +8,7 @@ class SettingsRepository:
             db = DatabaseConnection().get_connection()
             cursor = db.cursor()
             cursor.execute(
-                "UPDATE users SET password = ? WHERE id = ?",
+                "UPDATE Patients SET password = ? WHERE patient_id = ?",
                 (new_password, user_id)
             )
             db.commit()
@@ -27,7 +27,7 @@ class SettingsRepository:
             db = DatabaseConnection().get_connection()
             cursor = db.cursor()
             cursor.execute(
-                "UPDATE users SET email = ? WHERE id = ?",
+                "UPDATE Patients SET email = ? patient_id = ?",
                 (new_email, user_id)
             )
             db.commit()
@@ -46,7 +46,7 @@ class SettingsRepository:
             db = DatabaseConnection().get_connection()
             cursor = db.cursor()
             cursor.execute(
-                "UPDATE users SET full_name = ? WHERE id = ?",
+                "UPDATE Patients SET full_name = ? WHERE patient_id = ?",
                 (new_name, user_id)
             )
             db.commit()
@@ -60,7 +60,7 @@ class SettingsRepository:
             db = DatabaseConnection().get_connection()
             cursor = db.cursor()
             cursor.execute(
-                "UPDATE users SET email = ? WHERE id = ?",
+                "UPDATE Patients SET email = ? WHERE patient_id = ?",
                 (new_email, user_id)
             )
             db.commit()
@@ -73,13 +73,13 @@ class SettingsRepository:
             db = DatabaseConnection().get_connection()
             cursor = db.cursor()
             cursor.execute(
-                "SELECT id, full_name, email FROM users WHERE id = ?",
+                "SELECT patient_id, full_name, email FROM Patients WHERE patient_id = ?",
                 (user_id,)
             )
             row = cursor.fetchone()
             if row:
                 return {
-                    'id': row[0],
+                    'patient_id': row[0],
                     'full_name': row[1],
                     'email': row[2]
                 }
