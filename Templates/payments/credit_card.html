@@ -1,0 +1,80 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credit Card Form</title>
+  <link rel="stylesheet" href="/static/styles/credit_card.css">
+  <script defer src="/static/scripts/credit_card.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+</head>
+<body>
+  <div class="tips">
+    Payment card number: (4) VISA, (51-55) MasterCard, (36-38-39) QNB, (34-37) Telda, (65) CIB, (5019) Masr
+  </div>
+  
+  <div class="container">
+    <div class="col1">
+      <div class="card" id="card">
+        <div class="front">
+          <div class="type">
+            <!-- <div class="bankid" id="card-type"></div> -->
+             <img class="bankid" />
+          </div>
+          <span class="chip"></span>
+          <span class="card_number" id="card-number">&#x25CF;&#x25CF;&#x25CF;&#x25CF; &#x25CF;&#x25CF;&#x25CF;&#x25CF; &#x25CF;&#x25CF;&#x25CF;&#x25CF; &#x25CF;&#x25CF;&#x25CF;&#x25CF;</span>
+          <div class="date">
+            <span class="date_value" id="card-date">MM / YYYY</span>
+          </div>
+          <span class="fullname" id="card-name">FULL NAME</span>
+        </div>
+        <div class="back">
+          <div class="magnetic"></div>
+          <div class="bar"></div>
+          <span class="seccode" id="card-ccv">&#x25CF;&#x25CF;&#x25CF;</span>
+          <span class="chip"></span>
+          <span class="disclaimer">This card is property of ClinicEase. If found please return to ClinicEase - Cairo, Egypt</span>
+        </div>
+      </div>
+    </div>
+  
+    <div class="col2">
+      <!-- Javascriot ne3adel 3aleeh 3ashan teshta8al -->
+      <!-- <div class="success-message" id="success-message">
+        Payment processed successfully! Redirecting to your appointment details...
+      </div> -->
+
+      <!-- <input type="hidden" id="purchase_id" name="purchase_id" value="{{ purchase_id }}"> -->
+       <input type="hidden" id="purchase_id" name="purchase_id" value="1">
+
+      <!-- <input type="hidden" id="amount" name="amount" value="{{ '%.2f'|format(amount|default(0)) }}"> -->
+       <input type="hidden" id="amount" name="amount" value="50.20">
+
+      <label>Card Number</label>
+      <input class="number" type="text" id="card_number" maxlength="19" placeholder="1234 5678 9012 3456" autocomplete="off">
+      <!-- <div class="error-message" id="card-error">Please enter a valid card number</div> -->
+      
+      <label>Cardholder name</label>
+      <input class="inputname" type="text" id="cardholder_name" placeholder="JOHN DOE" autocomplete="off">
+      <!-- <div class="error-message" id="name-error">Please enter the cardholder name</div> -->
+      
+      <label>Expiry date</label>
+      <input class="expire" type="text" id="expiry_date" placeholder="MM / YYYY" maxlength="9" autocomplete="off">
+      <!-- <div class="error-message" id="expiry-error">Please enter a valid expiry date (MM/YYYY)</div> -->
+      
+      <label>Security Number</label>
+      <input class="ccv" type="text" id="cvv" placeholder="123" maxlength="3" autocomplete="off">
+      <!-- <div class="error-message" id="cvv-error">Please enter a 3-digit CVV</div> -->
+      
+      <button class="buy" id="pay-button">
+         <!-- <i class="material-icons">lock</i> Pay {{ '%.2f'|format(amount|default(0)) }} EGP -->
+          <i class="material-icons">lock</i> Pay 50.20 EGP
+      </button>
+    </div>
+  </div>
+
+</body>
+</html>
