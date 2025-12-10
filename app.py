@@ -25,6 +25,7 @@ from authlib.integrations.flask_client import OAuth
 from controllers.reset_pass_controller import password_reset_bp
 from controllers.auth_controller import auth_bp
 from controllers.settings_controler import settings_bp
+from controllers.payment_controllers import payment_bp  # This payment_bp should match the blueprint name
 # from repositories.patient_repository import init_db
 
 # Load environment variables
@@ -94,6 +95,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(password_reset_bp)
 from controllers.pharamcy_controler import pharmacy_bp
 app.register_blueprint(pharmacy_bp)
+app.register_blueprint(payment_bp, url_prefix='/')  # Add url_prefix if needed
 
 # Home redirect
 @app.route("/")
