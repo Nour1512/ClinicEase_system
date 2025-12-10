@@ -21,6 +21,9 @@ from flask import Flask, redirect
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import os
+from controllers.invoice_controller import InvoiceController
+from controllers.service_controller import service_bp
+from controllers.invoice_controller import invoice_bp
 from authlib.integrations.flask_client import OAuth
 from controllers.reset_pass_controller import password_reset_bp
 from controllers.auth_controller import auth_bp
@@ -96,6 +99,8 @@ app.register_blueprint(password_reset_bp)
 from controllers.pharamcy_controler import pharmacy_bp
 app.register_blueprint(pharmacy_bp)
 app.register_blueprint(payment_bp, url_prefix='/')  # Add url_prefix if needed
+app.register_blueprint(service_bp)
+
 
 # Home redirect
 @app.route("/")
