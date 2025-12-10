@@ -54,15 +54,17 @@ def login():
             #     return redirect("/doctor/dashboard")
             # elif role == "admin":
             #     return redirect("/admin/dashboard")
-            return render_template("user/Settings.html")
+            return redirect("/dashboard")
         # user = patient_repo.get_patient_by_email(email)
         # if user and user.password == password:
         #     session["user_id"] = user.patient_id
         #     session["name"] = user.full_name
         #     return redirect("/dashboard")
         else:
-            return "Invalid email or password", 401
-    return render_template("user/login.html")
+            # return "Invalid email or password", 401
+            flash("Invalid email or password. Please try again.", "error")
+            return redirect(url_for("auth.login"))
+    return render_template("login.html")
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -129,6 +131,16 @@ def dashboard():
 def logout():
     session.clear()
     return redirect("/login")
+
+
+@auth_bp.route("/forgot-password")
+def forgot_password():
+    return render_template("forgot_pass.html")
+
+
+@auth_bp.route("/login-page")
+def login_page():
+    return render_template("login.html")  # or whatever your login template is called
 
 # ---------- GOOGLE OAUTH ----------
 @auth_bp.route("/login/google")
