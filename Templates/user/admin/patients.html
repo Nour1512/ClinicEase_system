@@ -1,0 +1,465 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Patient Dashboard - Patient List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/patients.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">Rx</div>
+                <div>
+                    <div class="sidebar-title">ClinicEase</div>
+                    <div class="sidebar-subtitle">Patient Management</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section-title">Main Menu</div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="icon">🏠</span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <span class="icon">💊</span>
+                        Medicines
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/payment-page">
+                        <span class="icon">💳</span>
+                        Payment
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/invoice-page">
+                        <span class="icon">💳</span>
+                        Invoices
+                    </a>
+                </li>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div><strong>TruCare Clinic</strong></div>
+                <div>Patient Management v1.0</div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="topbar">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input id="searchInput" class="search-input" type="text"
+                           placeholder="Search medicines by name, ID or supplier..." />
+                </div>
+
+                <div class="topbar-actions">
+                    <button class="chip-ai" type="button" id="aiHelperBtn">
+                        <span class="icon">⚡</span>
+                        <span>AI Assistance</span>
+                    </button>
+                    <button class="btn-round" type="button" title="Notifications">🔔</button>
+                    <div class="avatar">PH</div>
+                </div>
+            </div>
+
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1>Patient List</h1>
+                    <span id="medicineCountSubtitle">All registered patients</span>
+                </div>
+                <div class="page-header-right">
+                    <div class="filter-group">
+                        <label class="filter-label" for="genderFilter">Gender</label>
+                        <select id="genderFilter" class="select-input">
+                            <option value="">All Genders</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label" for="expiryFilter">Expiry</label>
+                        <select id="expiryFilter" class="select-input">
+                            <option value="">Any</option>
+                            <option value="near">Near expiry (≤ 30 days)</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label" for="sortSelect">Sort</label>
+                        <select id="sortSelect" class="select-input">
+                            <option value="name-asc">Name (A–Z)</option>
+                            <option value="name-desc">Name (Z–A)</option>
+                            <option value="price-asc">Price (Low–High)</option>
+                            <option value="price-desc">Price (High–Low)</option>
+                            <option value="quantity-asc">Qty (Low–High)</option>
+                            <option value="quantity-desc">Qty (High–Low)</option>
+                            <option value="expiry-asc">Expiry (Near–Far)</option>
+                            <option value="expiry-desc">Expiry (Far–Near)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-primary" type="button" id="newPatientBtn">
+                        <span class="icon">＋</span>
+                        <span>New Patient</span>
+                    </button>
+                </div>
+            </div>
+
+            <section class="content-card">
+                <div class="content-toolbar">
+                    <div class="content-toolbar-left">
+                        <div class="pill-count" id="patientCountPill">0 patients</div>
+                        <span id="filterSummary">Showing all patients</span>
+                    </div>
+
+
+                </div>
+
+                <div class="medicine-grid" id="patientGrid" 
+                     data-api-url="/api/patients"
+                     data-api-buy-url="/pharmacy/api/medicines/__ID__/buy"
+                     data-api-restock-url="/pharmacy/api/medicines/__ID__/restock"
+                     data-api-delete-url="/pharmacy/api/medicines/__ID__">
+                    {% if patients %}
+                        {% for patient in patients %}
+                        <div class="medicine-card" data-id="{{ patient.patient_id }}" >
+                            <div class="medicine-card-header">
+                                <div class="medicine-name">{{ patient.full_name }}</div>
+                                <div class="medicine-id">ID: {{ patient.patient_id }}</div>
+                            </div>
+                            <div class="medicine-details">
+                                <div>Email: {{ patient.email }}</div>
+                                <div>DOB: {{ patient.dob }}</div>
+                                <div>Gender: {{ patient.gender }}</div>
+                                <div>Emergency Contact: {{ patient.emergency_contact }}</div>
+                            </div>
+                            <div class="medicine-meta" style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(229, 231, 235, 0.6);">
+                                <span>Address: <strong>{{ patient.address }}</strong></span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align: center; padding: 2rem; color: #666;">
+                            <p>No patients found in the database.</p>
+                        </div>
+                    {% endif %}
+
+
+            </section>
+        </main>
+    </div>
+
+    <div id="toast" class="toast hidden">
+        <div id="toastMessage"></div>
+    </div>
+
+    <div id="newMedicineModal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Add New patient</h2>
+                <button class="modal-close" id="closeModalBtn" type="button">&times;</button>
+            </div>
+            <form id="newMedicineForm" class="modal-form">
+                <div class="form-group">
+                    <label for="medicineName">Medicine Name <span class="required">*</span></label>
+                    <input type="text" id="medicineName" name="MedicineName" required 
+                           placeholder="Enter medicine name" />
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="quantity">Quantity <span class="required">*</span></label>
+                        <input type="number" id="quantity" name="Quantity" required min="0" 
+                               placeholder="0" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="price">Price ($) <span class="required">*</span></label>
+                        <input type="number" id="price" name="price" required min="0" step="0.01" 
+                               placeholder="0.00" />
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="supplier">Supplier <span class="required">*</span></label>
+                    <input type="text" id="supplier" name="supplier" required 
+                           placeholder="Enter supplier name" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="expiryDate">Expiry Date <span class="required">*</span></label>
+                    <input type="date" id="expiryDate" name="ExpiryDate" required />
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn-submit">Add Medicine</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("aiHelperBtn").addEventListener("click", function() {
+            window.location.href = "/chatbot-page";
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='scripts/patients.js') }}"></script>
+</body>
+</html>
+ -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Patient Dashboard - Patient List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/patients.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <!-- <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">Rx</div>
+                <div>
+                    <div class="sidebar-title">ClinicEase</div>
+                    <div class="sidebar-subtitle">Patient Management</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section-title">Main Menu</div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="icon">🏠</span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <span class="icon">💊</span>
+                        Medicines
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/payment-page">
+                        <span class="icon">💳</span>
+                        Payment
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/invoice-page">
+                        <span class="icon">💳</span>
+                        Invoices
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div><strong>TruCare Clinic</strong></div>
+                <div>Patient Management v1.0</div>
+            </div>
+        </aside> -->
+
+
+        {% include 'base/sidebar.html' %}
+
+        <main class="main">
+            <div class="topbar">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input id="searchInput" class="search-input" type="text"
+                           placeholder="Search patients by name, ID or email..." />
+                </div>
+
+                <div class="topbar-actions">
+                    <button class="chip-ai" type="button" id="aiHelperBtn">
+                        <span class="icon">⚡</span>
+                        <span>AI Assistance</span>
+                    </button>
+                    <button class="btn-round" type="button" title="Notifications">🔔</button>
+                    <div class="avatar">PH</div>
+                </div>
+            </div>
+
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1>Patient List</h1>
+                    <span id="medicineCountSubtitle">All registered patients</span>
+                </div>
+                <div class="page-header-right">
+                    <div class="filter-group">
+                        <label class="filter-label" for="genderFilter">Gender</label>
+                        <select id="genderFilter" class="select-input">
+                            <option value="">All Genders</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+
+                    <!-- <div class="filter-group">
+                        <label class="filter-label" for="sortSelect">Sort</label>
+                        <select id="sortSelect" class="select-input">
+                            <option value="name-asc">Name (A–Z)</option>
+                            <option value="name-desc">Name (Z–A)</option>
+                        </select>
+                    </div> -->
+
+                    <!-- <button class="btn-primary" type="button" id="newPatientBtn">
+                        <span class="icon">＋</span>
+                        <span>New Patient</span>
+                    </button> -->
+
+                    {% if session.role == "admin" %}
+                    <button class="btn-primary" type="button" id="newPatientBtn">
+                        <span class="icon">＋</span>
+                        <span>New Patient</span>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <section class="content-card">
+                <div class="content-toolbar">
+                    <div class="content-toolbar-left">
+                        <div class="pill-count" id="patientCountPill">0 patients</div>
+                        <span id="filterSummary">Showing all patients</span>
+                    </div>
+                </div>
+
+                <div class="medicine-grid" id="patientGrid" 
+                     data-api-url="/patients/api/patients">
+                    {% if patients %}
+                        {% for patient in patients %}
+                        <div class="medicine-card" data-id="{{ patient.patient_id }}">
+                            <div class="badge-id">{{ patient.patient_id }}</div>
+                            <div class="medicine-card-header">
+                                <!-- PATIENT INITIALS AVATAR -->
+                                <div class="medicine-avatar">
+                                    {{ patient.full_name.split(' ')[0][:1] }}{{ patient.full_name.split(' ')[1][:1] }}
+                                </div>
+                                <div>
+                                    <div class="medicine-title">{{ patient.full_name }}</div>
+                                    <div class="medicine-subtitle">Age: {{ patient.age }} • {{ patient.gender }}</div>
+                                </div>
+                            </div>
+                            <div class="medicine-meta">
+                                <span>Email: <strong>{{ patient.email }}</strong></span>
+                                <span>DOB: <strong>{{ patient.dob }}</strong></span>
+                            </div>
+                            <div class="medicine-footer">
+                                <div class="stock-status stock-healthy">
+                                    <span class="dot"></span>
+                                    <span>Active</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn-mini buy" data-action="view" data-id="{{ patient.patient_id }}">View</button>
+                                </div>
+                            </div>
+                            <div class="medicine-meta" style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(229, 231, 235, 0.6);">
+                                <span>Address: <strong>{{ patient.address }}</strong></span>
+                                <span style="padding: 2px 8px; border-radius: 999px; background: #dcfce7; color: #15803d; font-size: 11px;">Emergency: {{ patient.emergency_contact }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align: center; padding: 2rem; color: #666;">
+                            <p>No patients found in the database.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="toast" class="toast hidden">
+        <div id="toastMessage"></div>
+    </div>
+
+    <div id="newPatientModal" class="modal-overlay hidden">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2>Add New Patient</h2>
+            <button class="modal-close" id="closeModalBtn" type="button">&times;</button>
+        </div>
+        <form id="newPatientForm" class="modal-form">
+            <div class="form-group">
+                <label for="fullName">Full Name <span class="required">*</span></label>
+                <input type="text" id="fullName" name="full_name" required placeholder="Enter full name" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="user@example.com" />
+                </div>
+                <!-- PHONE FIELD REMOVED -->
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dob">Date of Birth <span class="required">*</span></label>
+                    <input type="date" id="dob" name="dob" required />
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender <span class="required">*</span></label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address">Address <span class="required">*</span></label>
+                <input type="text" id="address" name="address" required placeholder="Street, City, Country" />
+            </div>
+            <div class="form-group">
+                <label for="emergencyContact">Emergency Contact <span class="required">*</span></label>
+                <input type="text" id="emergencyContact" name="emergency_contact" required placeholder="Name and phone" />
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+                <button type="submit" class="btn-submit">Add Patient</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <script>
+        document.getElementById("aiHelperBtn").addEventListener("click", function() {
+            window.location.href = "/chatbot-page";
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='scripts/patients.js') }}"></script>
+</body>
+</html>

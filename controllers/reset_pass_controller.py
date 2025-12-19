@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import secrets
 import os
 
-password_reset_bp = Blueprint("password_reset", __name__)
+password_reset_bp = Blueprint("password_reset", __name__ , template_folder="Templates/user")
 
 def send_reset_email(email, code):
     from app import mail
@@ -110,7 +110,7 @@ def verify_reset_code():
         return redirect(url_for("password_reset.forgot_password"))
     
     if request.method == "GET":
-        return render_template("verify_code.html", email=email)
+        return render_template("user/verify_code.html", email=email)
 
     if request.method == "POST":
         code = request.form["code"]
@@ -126,7 +126,7 @@ def verify_reset_code():
             return redirect(url_for("password_reset.forgot_password"))
         if code != stored_code:
             flash("Incorrect code.", "error")
-            return render_template("verify_code.html", email=email)
+            return render_template("user/verify_code.html", email=email)
 
         repo.mark_code_as_used(email)
         session["reset_email"] = email
@@ -137,7 +137,7 @@ def verify_reset_code():
 
 @password_reset_bp.route("/password-changed")
 def password_changed():
-    return render_template("pass_changed.html")
+    return render_template("user/pass_changed.html")
 
 
 @password_reset_bp.route("/reset-password", methods=["GET", "POST"])
@@ -147,7 +147,7 @@ def reset_password():
         return redirect(url_for("password_reset.forgot_password"))
     
     if request.method == "GET":
-        return render_template("reset_pass.html")
+        return render_template("user/reset_pass.html")
     
     if request.method == "POST":
         # from werkzeug.security import generate_password_hash

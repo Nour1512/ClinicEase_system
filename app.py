@@ -17,13 +17,13 @@
 #     app.run(debug=True)
 
 
-from flask import Flask, redirect
+from flask import Flask, redirect , session
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import os
 from controllers.invoice_controller import InvoiceController
 from controllers.service_controller import service_bp
-from controllers.invoice_controller import invoice_bp
+# from controllers.invoice_controller import invoice_bp
 from authlib.integrations.flask_client import OAuth
 from controllers.reset_pass_controller import password_reset_bp
 from controllers.auth_controller import auth_bp
@@ -35,6 +35,7 @@ from controllers.payment_controllers import payment_bp  # This payment_bp should
 load_dotenv()
 
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 app.secret_key = os.getenv("SECRET_KEY")
 
 # Initialize DB
@@ -100,6 +101,39 @@ from controllers.pharamcy_controler import pharmacy_bp
 app.register_blueprint(pharmacy_bp)
 app.register_blueprint(payment_bp, url_prefix='/')  # Add url_prefix if needed
 app.register_blueprint(service_bp)
+from controllers.chatbot_controller import chatbot_bp
+app.register_blueprint(chatbot_bp)
+from controllers.invoice_controller import invoice_bp
+app.register_blueprint(invoice_bp)
+# from controllers.service_controller import service_bp
+# app.register_blueprint(service_bp)
+from controllers.patient_controller import patients_bp
+app.register_blueprint(patients_bp, url_prefix='/patients')
+
+from controllers.admin_controller import admin_bp
+from controllers.doctor_controller import doctor_bp
+
+app.register_blueprint(admin_bp, url_prefix='/admin')
+app.register_blueprint(doctor_bp, url_prefix='/doctor')
+
+
+from controllers.profile_completion_controller import get_missing_profile_fields
+# This automatically passes missing_profile_fields to every template without needing to pass it manually in each route.
+@app.context_processor
+def inject_profile_status():
+    """
+    Makes 'missing_profile_fields' available in ALL templates
+    """
+    return dict(missing_profile_fields=get_missing_profile_fields())
+
+
+@app.context_processor
+def inject_user_info():
+    return {
+        'current_role': session.get('role'),
+        'user_id': session.get('user_id')
+    }
+
 
 
 # Home redirect

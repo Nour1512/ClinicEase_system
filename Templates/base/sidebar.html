@@ -1,0 +1,89 @@
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">Rx</div>
+        <div>
+            <div class="sidebar-title">ClinicEase</div>
+            <div class="sidebar-subtitle">{{ current_role|capitalize }} Dashboard</div>
+        </div>
+    </div>
+
+    <div class="sidebar-section-title">Main Menu</div>
+    <ul class="nav-list">
+        <!-- DASHBOARD (Common) -->
+        <li class="nav-item">
+            <a class="nav-link" href="/dashboard">
+                <span class="icon">🏠</span>
+                Dashboard
+            </a>
+        </li>
+
+        <!-- ROLE-SPECIFIC MAIN PAGES -->
+        {% if current_role == "admin" %}
+            <!-- Admin sees Patients as main "Medicines" equivalent -->
+            <li class="nav-item">
+                <a class="nav-link active" href="/admin/patients">
+                    <span class="icon">👥</span>
+                    All Patients
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/patients">
+                    <span class="icon">👨‍⚕️</span>
+                    Doctors
+                </a>
+            </li>
+
+        {% elif current_role == "doctor" %}
+            <!-- Doctor sees "My Patients" as main page -->
+            <li class="nav-item">
+                <a class="nav-link active" href="/doctor/patients">
+                    <span class="icon">👥</span>
+                    My Patients
+                </a>
+            </li>
+            <!-- Doctor also gets Medicines -->
+            <li class="nav-item">
+                <a class="nav-link" href="/pharmacy">
+                    <span class="icon">💊</span>
+                    Medicines
+                </a>
+            </li>
+
+        {% else %} <!-- Patient -->
+            <!-- Patient gets standard patient pages -->
+            <li class="nav-item">
+                <a class="nav-link active" href="/pharmacy">
+                    <span class="icon">💊</span>
+                    Medicines
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/payment-page">
+                    <span class="icon">💳</span>
+                    Payment
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/invoice-page">
+                    <span class="icon">📄</span>
+                    Invoices
+                </a>
+            </li>
+        {% endif %}
+
+        <!-- Profile Completion (Patient Only) -->
+        {% if current_role == "patient" and missing_profile_fields %}
+        <li class="nav-item">
+            <a class="nav-link" href="/patients/complete-profile">
+                <span class="icon">⚠️</span>
+                Complete Profile
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+
+    <div class="sidebar-footer">
+        <div><strong>TruCare Clinic</strong></div>
+        <div>{{ current_role|capitalize }} Portal v1.0</div>
+    </div>
+</aside>

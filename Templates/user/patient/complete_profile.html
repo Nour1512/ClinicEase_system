@@ -1,0 +1,128 @@
+<!-- Complete Profile Page
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/profile_completion.css') }}">
+<div class="profile-completion">
+    {% if missing_fields %}
+        <div class="alert alert-warning">
+            <strong>⚠️ Incomplete Profile</strong>
+            <span class="red-dot">●</span> Please complete the following:
+        </div>
+        
+        <form method="POST">
+            {% for field, label in missing_fields.items() %}
+                <div class="form-group">
+                    <label for="{{ field }}">{{ label }}
+                        <span class="red-dot">●</span>
+                    </label>
+                    
+                    {% if field == 'gender' %}
+                        <select name="gender" id="gender" class="form-control" required>
+                            <option value="">Select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    {% elif field == 'date_of_birth' %}
+                        <input type="date" name="date_of_birth" id="date_of_birth" class="form-control" required>
+                    {% elif field == 'medical_history' %}
+                        <textarea name="medical_history" id="medical_history" class="form-control" rows="3" placeholder="Allergies, chronic conditions, etc." required></textarea>
+                    {% else %}
+                        <input type="text" name="{{ field }}" id="{{ field }}" class="form-control" 
+                               placeholder="Enter {{ label|lower }}" required>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary">Save Profile</button>
+        </form>
+    {% else %}
+        <div class="alert alert-success">
+            ✅ Your profile is complete!
+        </div>
+    {% endif %}
+</div> -->
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Complete Your Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/profile_completion.css') }}">
+</head>
+<body>
+    <div class="completion-container">
+        {% if missing_fields %}
+        <div class="profile-completion-alert">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <h2>Complete Your Profile</h2>
+                <p>Please fill in the missing information to access all clinic features.</p>
+            </div>
+        </div>
+        
+        <div class="completion-header">
+            <h1>Profile Information</h1>
+            <p>Your privacy is important to us. All information is securely stored.</p>
+        </div>
+        
+        <form class="completion-form" method="POST">
+            {% for field, label in missing_fields.items() %}
+            <div class="form-group">
+                <label for="{{ field }}">
+                    {{ label }}
+                    <span class="red-dot">●</span>
+                </label>
+                
+                {% if field == 'gender' %}
+                <select name="gender" id="gender" class="form-control" required>
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                
+                {% elif field == 'dob' %}
+                <input type="date" name="dob" id="dob" class="form-control" required>
+                
+                {% elif field == 'medical_history' %}
+                <textarea name="medical_history" id="medical_history" class="form-control" 
+                          placeholder="Allergies, chronic conditions, medications, etc." required></textarea>
+                
+                {% else %}
+                <input type="text" name="{{ field }}" id="{{ field }}" class="form-control" 
+                       placeholder="Enter {{ label|lower }}" required>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Save Profile</button>
+            </div>
+        </form>
+        
+        {% else %}
+        <div class="completion-success">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <h2>Profile Complete!</h2>
+            <p>You now have full access to all clinic features.</p>
+            <div style="margin-top: 32px; text-align: center;">
+                <a href="{{ url_for('pharmacy.pharmacy_home') }}" class="btn-primary">
+                    <span class="icon">⬅️</span>
+                    Go Back
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='scripts/complete_profile.js') }}"></script>
+</body>
+</html>

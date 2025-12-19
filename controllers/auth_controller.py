@@ -64,7 +64,7 @@ def login():
             # return "Invalid email or password", 401
             flash("Invalid email or password. Please try again.", "error")
             return redirect(url_for("auth.login"))
-    return render_template("login.html")
+    return render_template("user/login.html")
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -81,34 +81,27 @@ def signup():
         return redirect("/dashboard")
     return render_template("signup.html")
 
-# Add these to your auth_bp (or a new dashboard blueprint)
 
-# @auth_bp.route("/patient/dashboard")
-# def patient_dashboard():
-#     if session.get("role") != "patient":
-#         return redirect("/login")
-#     return render_template("patient/dashboard.html", name=session.get("name"))
-
-# @auth_bp.route("/doctor/dashboard")
-# def doctor_dashboard():
-#     if session.get("role") != "doctor":
-#         return redirect("/login")
-#     return render_template("doctor/dashboard.html", name=session.get("name"))
-
-# @auth_bp.route("/admin/dashboard")
-# def admin_dashboard():
-#     if session.get("role") != "admin":
-#         return redirect("/login")
-#     return render_template("admin/dashboard.html", name=session.get("name"))
-
-
+#sha8ala
 
 
 # @auth_bp.route("/dashboard")
 # def dashboard():
 #     if "user_id" not in session:
 #         return redirect("/login")
-#     return render_template("dashboard.html", name=session.get("name"))
+    
+#     role = session.get("role")
+#     if role == "patient":
+#         return render_template("pharmacy/pharamcy.html", name=session["name"])
+#     elif role == "doctor":
+#         # return render_template("user/doctor/doctors.html", name=session["name"])
+#         return render_template("user/admin/patients.html", name=session["name"])
+#     elif role == "admin":
+#         return render_template("user/admin/patients.html", name=session["name"])      # 7ateet patients page badal dashboard
+#     else:
+#         return redirect("/login")
+
+
 
 
 @auth_bp.route("/dashboard")
@@ -118,13 +111,17 @@ def dashboard():
     
     role = session.get("role")
     if role == "patient":
-        return render_template("pharmacy/pharmacy.html", name=session["name"])
+        return redirect("/pharmacy")
     elif role == "doctor":
-        return render_template("doctor/dashboard.html", name=session["name"])
+        # return render_template("user/doctor/doctors.html", name=session["name"])
+        return redirect("/doctor/patients")
     elif role == "admin":
-        return render_template("admin/dashboard.html", name=session["name"])
+        return redirect("/admin/patients")      # 7ateet patients page badal dashboard
     else:
         return redirect("/login")
+
+
+
 
 
 @auth_bp.route("/logout")
@@ -135,12 +132,12 @@ def logout():
 
 @auth_bp.route("/forgot-password")
 def forgot_password():
-    return render_template("forgot_pass.html")
+    return render_template("user/forgot_pass.html")
 
 
 @auth_bp.route("/login-page")
 def login_page():
-    return render_template("login.html")  # or whatever your login template is called
+    return render_template("user/login.html")  # or whatever your login template is called
 
 # ---------- GOOGLE OAUTH ----------
 @auth_bp.route("/login/google")

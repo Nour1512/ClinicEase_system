@@ -1,6 +1,14 @@
-from flask import request, jsonify
+from flask import request, jsonify , Blueprint , render_template
 # from repositries.invoice_repository import InvoiceRepositor
 from repositories.invoice_repository import InvoiceRepository
+invoice_bp = Blueprint("invoice", __name__)
+
+
+@invoice_bp.route("/invoice-page")
+def invoice():
+    return render_template("invoice/invoice.html")
+
+
 class InvoiceController:
     _repository = InvoiceRepository()
 

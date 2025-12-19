@@ -11,7 +11,7 @@
 </head>
 <body>
     <div class="app-shell">
-        <aside class="sidebar">
+        <!-- <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">Rx</div>
                 <div>
@@ -40,7 +40,9 @@
                 <div><strong>TruCare Clinic</strong></div>
                 <div>Inventory v1.0</div>
             </div>
-        </aside>
+        </aside> -->
+
+        {% include 'base/sidebar.html' %}
 
         <main class="main">
             <div class="topbar">
@@ -56,7 +58,24 @@
                         <span>AI Assistance</span>
                     </button>
                     <button class="btn-round" type="button" title="Notifications">🔔</button>
-                    <div class="avatar">PH</div>
+                    <!-- <div class="avatar-container">
+                        <div class="avatar">PH</div>
+                            {% if missing_profile_fields %}
+                                <a href="{{ url_for('patients.complete_profile') }}" class="profile-alert-dot">●</a>
+                            {% endif %}
+                    </div> -->
+
+                    {% if missing_profile_fields %}
+                    <a href="{{ url_for('patients.complete_profile') }}" class="avatar-container">
+                        <div class="avatar">PH</div>
+                        <span class="profile-alert-dot">●</span>
+                    </a>
+                    {% else %}
+                    <div class="avatar-container">
+                        <div class="avatar">PH</div>
+                    </div>
+                    {% endif %}
+                    <!-- <div class="avatar">PH</div> -->
                 </div>
             </div>
 
