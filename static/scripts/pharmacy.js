@@ -41,6 +41,7 @@ class Pharmacy {
     }
 }
 
+// ======== DOM ELEMENTS ========
 const gridEl = document.getElementById("medicineGrid");
 const searchInput = document.getElementById("searchInput");
 const supplierFilter = document.getElementById("supplierFilter");
@@ -52,13 +53,16 @@ const filterSummary = document.getElementById("filterSummary");
 const toast = document.getElementById("toast");
 const toastMessage = document.getElementById("toastMessage");
 
+// API URLs
 const API_LIST_URL = gridEl.dataset.apiUrl;
 const API_BUY_URL_TEMPLATE = gridEl.dataset.apiBuyUrl;
 const API_RESTOCK_URL_TEMPLATE = gridEl.dataset.apiRestockUrl;
 const API_DELETE_URL_TEMPLATE = gridEl.dataset.apiDeleteUrl;
 
 let medicines = [];
+let cart = []; // <-- New cart array
 
+// ======== LOAD MEDICINES ========
 async function loadMedicines() {
     try {
         if (!API_LIST_URL || API_LIST_URL === 'undefined') {
@@ -68,38 +72,24 @@ async function loadMedicines() {
         }
         
         const res = await fetch(API_LIST_URL);
-        
-        if (!res.ok) {
-            const errorData = await res.json().catch(() => ({ error: `HTTP ${res.status}: ${res.statusText}` }));
-            throw new Error(errorData.error || `Server error: ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         
         const data = await res.json();
-        
         if (Array.isArray(data)) {
             medicines = data.map(Pharmacy.from_dict);
             renderSuppliersFilter();
             renderGrid();
-        } else if (data.error) {
-            throw new Error(data.error);
-        } else {
-            throw new Error("Invalid response format from server");
         }
     } catch (err) {
         console.error("Error loading medicines:", err);
-        const errorMsg = err.message || "Failed to load medicines from server. Please check your database connection.";
-        showToast(errorMsg);
-        
-        // Show empty state
-        if (gridEl) {
-            gridEl.innerHTML = `<div style="text-align: center; padding: 2rem; color: #dc2626;">
-                <p><strong>Error loading medicines</strong></p>
-                <p style="font-size: 0.9em; margin-top: 0.5rem;">${errorMsg}</p>
-            </div>`;
-        }
+        showToast("Failed to load medicines.");
+        gridEl.innerHTML = `<div style="text-align: center; padding: 2rem; color: #dc2626;">
+            <p><strong>Error loading medicines</strong></p>
+        </div>`;
     }
 }
 
+// ======== RENDER FILTER ========
 function renderSuppliersFilter() {
     supplierFilter.innerHTML = '<option value="">All Suppliers</option>';
     const suppliers = Array.from(new Set(medicines.map(m => m.supplier))).sort();
@@ -111,9 +101,9 @@ function renderSuppliersFilter() {
     });
 }
 
+// ======== FILTER & SORT ========
 function filteredAndSortedMedicines() {
     let result = [...medicines];
-
     const q = searchInput.value.trim().toLowerCase();
     if (q) {
         result = result.filter(m =>
@@ -122,44 +112,28 @@ function filteredAndSortedMedicines() {
             m.supplier.toLowerCase().includes(q)
         );
     }
-
-    if (supplierFilter.value) {
-        result = result.filter(m => m.supplier === supplierFilter.value);
-    }
-
-    if (expiryFilter.value === "near") {
-        result = result.filter(m => m.isNearExpiry() && !m.isExpired());
-    } else if (expiryFilter.value === "expired") {
-        result = result.filter(m => m.isExpired());
-    }
+    if (supplierFilter.value) result = result.filter(m => m.supplier === supplierFilter.value);
+    if (expiryFilter.value === "near") result = result.filter(m => m.isNearExpiry() && !m.isExpired());
+    else if (expiryFilter.value === "expired") result = result.filter(m => m.isExpired());
 
     const sortValue = sortSelect.value;
     result.sort((a, b) => {
         switch (sortValue) {
-            case "name-asc":
-                return a.MedicineName.localeCompare(b.MedicineName);
-            case "name-desc":
-                return b.MedicineName.localeCompare(a.MedicineName);
-            case "price-asc":
-                return a.price - b.price;
-            case "price-desc":
-                return b.price - a.price;
-            case "quantity-asc":
-                return a.Quantity - b.Quantity;
-            case "quantity-desc":
-                return b.Quantity - a.Quantity;
-            case "expiry-asc":
-                return a.ExpiryDate - b.ExpiryDate;
-            case "expiry-desc":
-                return b.ExpiryDate - a.ExpiryDate;
-            default:
-                return 0;
+            case "name-asc": return a.MedicineName.localeCompare(b.MedicineName);
+            case "name-desc": return b.MedicineName.localeCompare(a.MedicineName);
+            case "price-asc": return a.price - b.price;
+            case "price-desc": return b.price - a.price;
+            case "quantity-asc": return a.Quantity - b.Quantity;
+            case "quantity-desc": return b.Quantity - a.Quantity;
+            case "expiry-asc": return a.ExpiryDate - b.ExpiryDate;
+            case "expiry-desc": return b.ExpiryDate - a.ExpiryDate;
+            default: return 0;
         }
     });
-
     return result;
 }
 
+// ======== RENDER GRID ========
 function renderGrid() {
     const data = filteredAndSortedMedicines();
     gridEl.innerHTML = "";
@@ -168,53 +142,19 @@ function renderGrid() {
         const card = document.createElement("article");
         card.className = "medicine-card";
 
-        if (med.isExpired()) {
-            card.style.boxShadow = "0 0 0 1px rgba(220, 38, 38, 0.2)";
-        } else if (med.isNearExpiry()) {
-            card.style.boxShadow = "0 0 0 1px rgba(249, 115, 22, 0.2)";
-        }
-
         const status = med.stockStatus();
         const statusText =
-            status === "healthy"
-                ? "Healthy stock"
-                : status === "low"
-                ? "Low stock"
-                : "Critical";
-
+            status === "healthy" ? "Healthy stock" :
+            status === "low" ? "Low stock" : "Critical";
         const statusClass =
-            status === "healthy"
-                ? "stock-healthy"
-                : status === "low"
-                ? "stock-low"
-                : "stock-critical";
+            status === "healthy" ? "stock-healthy" :
+            status === "low" ? "stock-low" : "stock-critical";
 
-        const expiryLabel = med.isExpired()
-            ? "Expired"
-            : med.isNearExpiry()
-            ? "Near expiry"
-            : "Valid";
-
+        const expiryLabel = med.isExpired() ? "Expired" : med.isNearExpiry() ? "Near expiry" : "Valid";
         const expiryDateStr = med.ExpiryDate.toLocaleDateString();
         const initialLetter = med.MedicineName.charAt(0).toUpperCase();
 
-        let actionsHtml = "";
-        if (CURRENT_ROLE === "admin") {
-            actionsHtml = `
-                <button class="btn-mini" data-action="restock" data-id="${med.Medicine_id}">Restock</button>
-                <button class="btn-mini danger" data-action="dispose" data-id="${med.Medicine_id}">Delete</button>
-            `;
-        } else {
-            const disabled = med.Quantity <= 0 || med.isExpired() ? "disabled" : "";
-            const label = med.Quantity <= 0 ? "Out of stock" :
-                          med.isExpired() ? "Expired" : "Buy";
-            actionsHtml = `
-                <button class="btn-mini buy" data-action="buy" data-id="${med.Medicine_id}" ${disabled}>
-                    ${label}
-                </button>
-            `;
-        }
-
+        // ==== CARD HTML with ADD TO CART button ====
         card.innerHTML = `
             <div class="badge-id">${med.Medicine_id}</div>
             <div class="medicine-card-header">
@@ -236,7 +176,9 @@ function renderGrid() {
                     <span>${statusText}</span>
                 </div>
                 <div class="card-actions">
-                    ${actionsHtml}
+                    <button class="btn-mini add-to-cart" data-id="${med.Medicine_id}" ${med.Quantity <= 0 || med.isExpired() ? "disabled" : ""}>
+                        Add to Cart
+                    </button>
                 </div>
             </div>
 
@@ -253,101 +195,38 @@ function renderGrid() {
     medicineCountSubtitle.textContent = `Total in system: ${medicines.length}`;
     filterSummary.textContent = buildFilterSummary(data.length);
 
-    gridEl.querySelectorAll("button[data-action]").forEach(btn => {
-        btn.addEventListener("click", onCardActionClick);
+    // ===== ADD TO CART EVENTS =====
+    gridEl.querySelectorAll(".add-to-cart").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const id = btn.dataset.id;
+            const med = medicines.find(m => m.Medicine_id === id);
+            if (!med) return;
+            cart.push(med);
+            showToast(`${med.MedicineName} added to cart. Total items: ${cart.length}`);
+        });
     });
 }
 
+// ======== FILTER SUMMARY ========
 function buildFilterSummary(currentCount) {
     const parts = [];
     const sup = supplierFilter.value;
     const exp = expiryFilter.value;
     const q = searchInput.value.trim();
-
     if (!sup && !exp && !q) return "Showing all medicines";
-
     if (q) parts.push(`matching "${q}"`);
     if (sup) parts.push(`from supplier ${sup}`);
     if (exp === "near") parts.push("near expiry");
     else if (exp === "expired") parts.push("expired");
-
     return `Showing ${currentCount} medicine${currentCount !== 1 ? "s" : ""} ${parts.join(", ")}`;
 }
 
-async function onCardActionClick(e) {
-    e.stopPropagation();
-    const btn = e.currentTarget;
-    const action = btn.dataset.action;
-    const id = btn.dataset.id;
-    const med = medicines.find(m => m.Medicine_id === id);
-    if (!med) return;
-
-    try {
-        if (action === "restock" || action === "dispose") {
-            if (CURRENT_ROLE !== "admin") {
-                showToast("You are not allowed to modify medicines.");
-                return;
-            }
-
-            if (action === "restock") {
-                const url = API_RESTOCK_URL_TEMPLATE.replace("__ID__", id);
-                const res = await fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ qty: 10 })
-                });
-                const data = await res.json();
-                if (!res.ok || !data.ok) {
-                    showToast(data.error || "Failed to restock.");
-                    return;
-                }
-                med.Quantity = data.new_qty;
-                showToast(`Restocked ${med.MedicineName}. New quantity: ${med.Quantity}`);
-            } else if (action === "dispose") {
-                const url = API_DELETE_URL_TEMPLATE.replace("__ID__", id);
-                const res = await fetch(url, { method: "DELETE" });
-                const data = await res.json();
-                if (!res.ok || !data.ok) {
-                    showToast(data.error || "Failed to delete.");
-                    return;
-                }
-                const idx = medicines.findIndex(m => m.Medicine_id === id);
-                if (idx !== -1) medicines.splice(idx, 1);
-                showToast(`Deleted ${med.MedicineName} from inventory.`);
-            }
-        } else if (action === "buy") {
-            if (med.Quantity <= 0 || med.isExpired()) {
-                showToast("This medicine cannot be purchased right now.");
-                return;
-            }
-            const url = API_BUY_URL_TEMPLATE.replace("__ID__", id);
-            const res = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ qty: 1 })
-            });
-            const data = await res.json();
-            if (!res.ok || !data.ok) {
-                showToast(data.error || "Failed to buy.");
-                return;
-            }
-            med.Quantity = data.new_qty;
-            showToast(`You bought 1 unit of ${med.MedicineName}. Remaining: ${med.Quantity}`);
-        }
-
-        renderGrid();
-    } catch (err) {
-        console.error(err);
-        showToast("Server error while processing action.");
-    }
-}
-
+// ======== TOAST ========
 let toastTimeout;
 function showToast(message) {
     toastMessage.textContent = message;
     toast.classList.remove("hidden");
     toast.classList.add("visible");
-
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(() => {
         toast.classList.remove("visible");
@@ -355,6 +234,7 @@ function showToast(message) {
     }, 3500);
 }
 
+// ======== INIT ========
 function init() {
     loadMedicines();
 
@@ -363,95 +243,18 @@ function init() {
     expiryFilter.addEventListener("change", renderGrid);
     sortSelect.addEventListener("change", renderGrid);
 
-    const aiBtn = document.getElementById("aiHelperBtn");
-    aiBtn?.addEventListener("click", () => {
-        showToast("AI Assistance is not connected yet, but the UI looks very intelligent!");
+    // ===== CHECKOUT BUTTON =====
+    const checkoutBtn = document.createElement("button");
+    checkoutBtn.textContent = "Checkout";
+    checkoutBtn.className = "btn-primary";
+    checkoutBtn.style.margin = "1rem";
+    checkoutBtn.addEventListener("click", () => {
+        if (cart.length === 0) return showToast("Cart is empty!");
+        let total = cart.reduce((sum, m) => sum + m.price, 0);
+        alert(`Checkout ${cart.length} item(s). Total: $${total.toFixed(2)}`);
+        cart = []; // clear cart
     });
-
-    const newMedBtn = document.getElementById("newMedicineBtn");
-    const modal = document.getElementById("newMedicineModal");
-    const closeModalBtn = document.getElementById("closeModalBtn");
-    const cancelBtn = document.getElementById("cancelBtn");
-    const newMedicineForm = document.getElementById("newMedicineForm");
-
-    function openModal() {
-        modal.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-        
-        const expiryDateInput = document.getElementById("expiryDate");
-        if (expiryDateInput) {
-            const today = new Date().toISOString().split('T')[0];
-            expiryDateInput.setAttribute('min', today);
-        }
-    }
-
-    function closeModal() {
-        modal.classList.add("hidden");
-        document.body.style.overflow = "";
-        newMedicineForm.reset();
-    }
-
-    newMedBtn?.addEventListener("click", openModal);
-    closeModalBtn?.addEventListener("click", closeModal);
-    cancelBtn?.addEventListener("click", closeModal);
-
-    modal?.addEventListener("click", (e) => {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
-
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !modal.classList.contains("hidden")) {
-            closeModal();
-        }
-    });
-
-    newMedicineForm?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        
-        const submitBtn = newMedicineForm.querySelector(".btn-submit");
-        const originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Adding...";
-
-        try {
-            const formData = new FormData(newMedicineForm);
-            
-            const medicineData = {
-                MedicineName: formData.get("MedicineName"),
-                Quantity: parseInt(formData.get("Quantity")),
-                price: parseFloat(formData.get("price")),
-                ExpiryDate: formData.get("ExpiryDate"),
-                supplier: formData.get("supplier")
-            };
-
-            const res = await fetch("/pharmacy/api/medicines", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(medicineData)
-            });
-
-            const data = await res.json();
-
-            if (!res.ok || !data.ok) {
-                throw new Error(data.error || "Failed to add medicine");
-            }
-
-            showToast(`Successfully added ${medicineData.MedicineName}!`);
-            closeModal();
-            
-            await loadMedicines();
-        } catch (err) {
-            console.error("Error adding medicine:", err);
-            showToast(err.message || "Failed to add medicine. Please try again.");
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-        }
-    });
+    gridEl.parentElement.insertBefore(checkoutBtn, gridEl);
 }
 
 document.addEventListener("DOMContentLoaded", init);
