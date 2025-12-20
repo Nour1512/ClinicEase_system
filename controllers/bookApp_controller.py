@@ -2,10 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for
 from models.bookApp import Appointment
 from repositories.bookApp_repository import AppointmentRepository
 
-appointment_bp = Blueprint("appointment", __name__)
+bookApp_bp = Blueprint("appointment", __name__)
 repo = AppointmentRepository()
 
-@appointment_bp.route("/", methods=["GET", "POST"])
+@bookApp_bp.route("/", methods=["GET", "POST"])
 def book_appointment():
     if request.method == "POST":
         appointment = Appointment(
@@ -26,6 +26,6 @@ def book_appointment():
     return render_template("form/Form.html")
 
 
-@appointment_bp.route("/success")
+@bookApp_bp.route("/success")
 def success():
     return "<h2>Appointment booked successfully ✅</h2>"
