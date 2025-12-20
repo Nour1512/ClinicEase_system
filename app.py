@@ -29,6 +29,7 @@ from controllers.reset_pass_controller import password_reset_bp
 from controllers.auth_controller import auth_bp
 from controllers.settings_controler import settings_bp
 from controllers.payment_controllers import payment_bp  # This payment_bp should match the blueprint name
+
 # from repositories.patient_repository import init_db
 
 # Load environment variables
@@ -116,6 +117,8 @@ from controllers.doctor_controller import doctor_bp
 app.register_blueprint(admin_bp, url_prefix='/admin')
 app.register_blueprint(doctor_bp, url_prefix='/doctor')
 
+from controllers.bookApp_controller import bookApp_bp  
+app.register_blueprint(bookApp_bp)
 
 from controllers.profile_completion_controller import get_missing_profile_fields
 # This automatically passes missing_profile_fields to every template without needing to pass it manually in each route.
