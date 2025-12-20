@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Book Appointment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Flask CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/bookApp.css') }}">
+</head>
+
+<body>
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+
+    <h2 style="text-align:center; margin-bottom:20px;">Book Appointment</h2>
+
+    <form method="POST">
+
+      <div class="formbold-mb-5">
+        <label class="formbold-form-label">Full Name</label>
+        <input type="text" name="name" placeholder="Full Name" class="formbold-form-input" minlength="7" required>
+      </div>
+
+      <div class="formbold-mb-5">
+        <label class="formbold-form-label">Phone Number</label>
+        <input type="text" name="phone" placeholder="Phone Number" class="formbold-form-input" minlength="11" maxlength="11" required>
+      </div>
+
+      <div class="formbold-mb-5">
+        <label class="formbold-form-label">Email</label>
+        <input type="email" name="email" placeholder="Email" class="formbold-form-input" required>
+      </div>
+
+      <div class="flex flex-wrap formbold--mx-3">
+        <div class="w-full sm:w-half formbold-px-3">
+          <div class="formbold-mb-5">
+            <label class="formbold-form-label">Date</label>
+            <input type="date" name="date" class="formbold-form-input" required>
+          </div>
+        </div>
+
+        <div class="w-full sm:w-half formbold-px-3">
+          <div class="formbold-mb-5">
+            <label class="formbold-form-label">Time</label>
+            <input type="time" name="time" class="formbold-form-input" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="formbold-mb-5 formbold-pt-3">
+        <label class="formbold-form-label formbold-form-label-2">
+          Address Details
+        </label>
+
+        <div class="flex flex-wrap formbold--mx-3">
+          <div class="w-full sm:w-half formbold-px-3">
+            <input type="text" name="area" placeholder="Area" class="formbold-form-input" required>
+          </div>
+
+          <div class="w-full sm:w-half formbold-px-3">
+            <input type="text" name="city" placeholder="City" class="formbold-form-input" required>
+          </div>
+
+          <div class="w-full sm:w-half formbold-px-3">
+            <input type="text" name="state" placeholder="State" class="formbold-form-input" required>
+          </div>
+
+          <div class="w-full sm:w-half formbold-px-3">
+            <input type="text" name="post_code" placeholder="Post Code" class="formbold-form-input" required>
+          </div>
+        </div>
+      </div>
+
+      <button class="formbold-btn" type="submit">Book Appointment</button>
+
+    </form>
+
+  </div>
+</div>
+</body>
+</html>

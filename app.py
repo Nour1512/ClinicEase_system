@@ -96,7 +96,9 @@ app.register_blueprint(password_reset_bp)
 from controllers.pharamcy_controler import pharmacy_bp
 app.register_blueprint(pharmacy_bp)
 app.register_blueprint(payment_bp, url_prefix='/')  # Add url_prefix if needed
+from controllers.bookApp_controller import bookApp_bp
 
+app.register_blueprint(bookApp_bp)
 # Home redirect
 @app.route("/")
 def home():
