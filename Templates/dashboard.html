@@ -1,0 +1,390 @@
+<!-- templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClinicEase - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-hospital-alt"></i> ClinicEase</h2>
+                <p>Medical Management System</p>
+            </div>
+            
+            <div class="user-profile">
+                <div class="avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="user-info">
+                    <h3>{{ name }}</h3>
+                    <span class="user-role">{{ role }}</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3>MAIN</h3>
+                    <ul class="nav-links">
+                        <li class="nav-item active">
+                            <a href="/dashboard">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/doctors">
+                                <i class="fas fa-user-md"></i>
+                                <span>Doctors</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/pharmacy">
+                                <i class="fas fa-pills"></i>
+                                <span>Pharmacy</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/appointments">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Appointments</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>PATIENT MANAGEMENT</h3>
+                    <ul class="nav-links">
+                        <li class="nav-item">
+                            <a href="/patients">
+                                <i class="fas fa-users"></i>
+                                <span>Patients</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/prescriptions">
+                                <i class="fas fa-file-prescription"></i>
+                                <span>Prescriptions</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/lab-tests">
+                                <i class="fas fa-flask"></i>
+                                <span>Lab Tests</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>SYSTEM</h3>
+                    <ul class="nav-links">
+                        <li class="nav-item">
+                            <a href="/settings">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/notifications">
+                                <i class="fas fa-bell"></i>
+                                <span>Notifications</span>
+                                <span class="notification-badge">3</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <div class="status-indicator active"></div>
+                    <span>System Online</span>
+                </div>
+                <div class="last-update">
+                    <small>Updated just now</small>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-left">
+                    <h1>Dashboard</h1>
+                    <p>Welcome back, {{ name }}! Here's what's happening today.</p>
+                </div>
+                <div class="header-right">
+                    <div class="date-display">
+                        <i class="fas fa-calendar-day"></i>
+                        <span id="current-date">Loading...</span>
+                    </div>
+                    <button class="btn-refresh" id="refresh-btn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon patients">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-patients">{{ stats.total_patients if stats else 0 }}</h3>
+                        <p>Total Patients</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i> 12%
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon doctors">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-doctors">{{ stats.total_doctors if stats else 0 }}</h3>
+                        <p>Active Doctors</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i> 5%
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon appointments">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="today-appointments">{{ stats.today_appointments if stats else 0 }}</h3>
+                        <p>Today's Appointments</p>
+                    </div>
+                    <div class="stat-trend down">
+                        <i class="fas fa-arrow-down"></i> 3%
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon revenue">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-revenue">${{ "%.2f"|format(stats.total_revenue) if stats else "0.00" }}</h3>
+                        <p>Total Revenue</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i> 18%
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-line"></i> Revenue Trend (Last 6 Months)</h3>
+                        <select class="chart-filter">
+                            <option>Last 6 Months</option>
+                            <option>Last Year</option>
+                            <option>Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-pie"></i> Doctors by Specialty</h3>
+                        <select class="chart-filter">
+                            <option>All Departments</option>
+                            <option>Surgery</option>
+                            <option>Cardiology</option>
+                        </select>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="specialtyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tables Section -->
+            <div class="tables-section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3><i class="fas fa-history"></i> Recent Activities</h3>
+                        <a href="/activities" class="view-all">View All →</a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="activity-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Time</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activities-table">
+                                {% for activity in recent_activities %}
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar {{ activity.user_type|lower }}">
+                                                <i class="fas fa-{{ activity.icon }}"></i>
+                                            </div>
+                                            <div>
+                                                <strong>{{ activity.user_name }}</strong>
+                                                <small>{{ activity.user_type }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ activity.action }}</td>
+                                    <td>{{ activity.timestamp.strftime('%I:%M %p') }}</td>
+                                    <td>{{ activity.timestamp.strftime('%b %d, %Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Upcoming Appointments</h3>
+                        <a href="/appointments" class="view-all">View All →</a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="appointments-table">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointments-table">
+                                {% for appointment in upcoming_appointments %}
+                                <tr>
+                                    <td>
+                                        <div class="patient-cell">
+                                            <div class="patient-avatar">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <span>{{ appointment.patient_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>Dr. {{ appointment.doctor_name }}</td>
+                                    <td>
+                                        <div class="time-slot">
+                                            <i class="far fa-clock"></i>
+                                            {{ appointment.time_slot }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {{ appointment.status|lower }}">
+                                            {{ appointment.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn-action view-btn">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div class="actions-grid">
+                    <a href="/appointments/new" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <span>New Appointment</span>
+                    </a>
+                    
+                    <a href="/prescriptions/new" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-file-prescription"></i>
+                        </div>
+                        <span>Create Prescription</span>
+                    </a>
+                    
+                    <a href="/patients/new" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span>Add Patient</span>
+                    </a>
+                    
+                    <a href="/pharmacy/order" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <span>Order Medicine</span>
+                    </a>
+                    
+                    <a href="/reports" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <span>Generate Report</span>
+                    </a>
+                    
+                    <a href="/notifications" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <span>View Alerts</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="main-footer">
+                <p>©️ 2024 ClinicEase System. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Help Center</a>
+                </div>
+            </footer>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+    <script>
+        // Initialize charts with data from Flask
+        const specialtyLabels = {{ specialty_labels|safe }};
+        const specialtyCounts = {{ specialty_counts|safe }};
+        const revenueMonths = {{ revenue_months|safe }};
+        const revenueAmounts = {{ revenue_amounts|safe }};
+    </script>
+</body>
+</html>
