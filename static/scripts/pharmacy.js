@@ -53,14 +53,22 @@ const filterSummary = document.getElementById("filterSummary");
 const toast = document.getElementById("toast");
 const toastMessage = document.getElementById("toastMessage");
 
-// API URLs
+// API URL
 const API_LIST_URL = gridEl.dataset.apiUrl;
-const API_BUY_URL_TEMPLATE = gridEl.dataset.apiBuyUrl;
-const API_RESTOCK_URL_TEMPLATE = gridEl.dataset.apiRestockUrl;
-const API_DELETE_URL_TEMPLATE = gridEl.dataset.apiDeleteUrl;
 
 let medicines = [];
-let cart = []; // <-- New cart array
+let cart = [];
+
+// ======== SAFE CART LOAD ========
+function loadCart() {
+    try {
+        const stored = JSON.parse(localStorage.getItem("cart"));
+        cart = Array.isArray(stored) ? stored : [];
+    } catch (e) {
+        cart = [];
+    }
+}
+loadCart();
 
 // ======== LOAD MEDICINES ========
 async function loadMedicines() {
@@ -89,7 +97,7 @@ async function loadMedicines() {
     }
 }
 
-// ======== RENDER FILTER ========
+// ======== FILTER ========
 function renderSuppliersFilter() {
     supplierFilter.innerHTML = '<option value="">All Suppliers</option>';
     const suppliers = Array.from(new Set(medicines.map(m => m.supplier))).sort();
@@ -139,8 +147,17 @@ function renderGrid() {
     gridEl.innerHTML = "";
 
     data.forEach(med => {
-        const card = document.createElement("article");
-        card.className = "medicine-card";
+        const card = document.createElement("div");
+        card.className = "medicine-card-container";
+        card.style.border = "1px solid #e5e7eb";
+        card.style.borderRadius = "12px";
+        card.style.padding = "1rem";
+        card.style.marginBottom = "1.5rem";
+        card.style.display = "flex";
+        card.style.flexDirection = "column";
+        card.style.alignItems = "center";
+        card.style.background = "white";
+        card.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08)";
 
         const status = med.stockStatus();
         const statusText =
@@ -151,60 +168,60 @@ function renderGrid() {
             status === "low" ? "stock-low" : "stock-critical";
 
         const expiryLabel = med.isExpired() ? "Expired" : med.isNearExpiry() ? "Near expiry" : "Valid";
-        const expiryDateStr = med.ExpiryDate.toLocaleDateString();
         const initialLetter = med.MedicineName.charAt(0).toUpperCase();
 
-        // ==== CARD HTML with ADD TO CART button ====
-        card.innerHTML = `
+        const details = document.createElement("div");
+        details.style.display = "flex";
+        details.style.flexDirection = "column";
+        details.style.alignItems = "center";
+        details.style.gap = "8px";
+        details.innerHTML = `
             <div class="badge-id">${med.Medicine_id}</div>
-            <div class="medicine-card-header">
-                <div class="medicine-avatar">${initialLetter}</div>
-                <div>
-                    <div class="medicine-title">${med.MedicineName}</div>
-                    <div class="medicine-subtitle">Supplier: ${med.supplier}</div>
+            <div class="medicine-card-header" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                <div class="medicine-avatar" style="width:50px; height:50px; border-radius:50%; background:#7c3aed; color:white; display:flex; justify-content:center; align-items:center; font-weight:bold;">${initialLetter}</div>
+                <div style="text-align:center;">
+                    <div class="medicine-title" style="font-weight:bold; font-size:1.1rem;">${med.MedicineName}</div>
+                    <div class="medicine-subtitle" style="font-size:0.9rem; color:#4b5563;">Supplier: ${med.supplier}</div>
                 </div>
             </div>
-
-            <div class="medicine-meta">
-                <span>Qty: <strong>${med.Quantity}</strong></span>
+            <div class="medicine-meta" style="margin-top:4px; font-size:0.95rem; text-align:center;">
+                <span>Qty: <strong>${med.Quantity}</strong></span> | 
                 <span>Price: <strong>$${med.price.toFixed(2)}</strong></span>
             </div>
-
-            <div class="medicine-footer">
-                <div class="stock-status ${statusClass}">
-                    <span class="dot"></span>
-                    <span>${statusText}</span>
-                </div>
-                <div class="card-actions">
-                    <button class="btn-mini add-to-cart" data-id="${med.Medicine_id}" ${med.Quantity <= 0 || med.isExpired() ? "disabled" : ""}>
-                        Add to Cart
-                    </button>
-                </div>
+            <div style="margin-top:4px; font-size:0.9rem; padding:2px 8px; border-radius:999px; background: ${med.isExpired() ? '#fee2e2' : med.isNearExpiry() ? '#fef3c7' : '#dcfce7'}; color: ${med.isExpired() ? '#b91c1c' : med.isNearExpiry() ? '#d97706' : '#15803d'};">
+                ${expiryLabel}
             </div>
-
-            <div class="medicine-meta" style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(229, 231, 235, 0.6);">
-                <span>Expiry: <strong>${expiryDateStr}</strong></span>
-                <span style="padding: 2px 8px; border-radius: 999px; background: ${med.isExpired() ? '#fee2e2' : med.isNearExpiry() ? '#fef3c7' : '#dcfce7'}; color: ${med.isExpired() ? '#b91c1c' : med.isNearExpiry() ? '#d97706' : '#15803d'}; font-size: 11px;">${expiryLabel}</span>
+            <div class="stock-status ${statusClass}" style="margin-top:4px; font-size:0.9rem;">
+                ${statusText}
             </div>
         `;
 
+        const controls = document.createElement("div");
+        controls.style.display = "flex";
+        controls.style.flexDirection = "column";
+        controls.style.alignItems = "center";
+        controls.style.gap = "8px";
+        controls.style.marginTop = "12px";
+
+        controls.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button class="btn-large decrement" data-id="${med.Medicine_id}" style="font-size:1.5rem; font-weight:bold; color:#7c3aed; width:40px; height:40px; border-radius:8px; border:1px solid #7c3aed; background:white; cursor:pointer;" ${med.Quantity <= 0 || med.isExpired() ? "disabled" : ""}>-</button>
+                <span class="quantity" data-id="${med.Medicine_id}" style="font-size:1.25rem; min-width:30px; text-align:center;">1</span>
+                <button class="btn-large increment" data-id="${med.Medicine_id}" style="font-size:1.5rem; font-weight:bold; color:#7c3aed; width:40px; height:40px; border-radius:8px; border:1px solid #7c3aed; background:white; cursor:pointer;" ${med.Quantity <= 0 || med.isExpired() ? "disabled" : ""}>+</button>
+            </div>
+            <button class="btn-primary add-to-cart-rounded" data-id="${med.Medicine_id}" style="border-radius:12px; font-size:1.15rem; padding:0.6rem 1.8rem; cursor:pointer;">
+                Add to Cart
+            </button>
+        `;
+
+        card.appendChild(details);
+        card.appendChild(controls);
         gridEl.appendChild(card);
     });
 
     medicineCountPill.textContent = `${data.length} medicine${data.length !== 1 ? "s" : ""}`;
     medicineCountSubtitle.textContent = `Total in system: ${medicines.length}`;
     filterSummary.textContent = buildFilterSummary(data.length);
-
-    // ===== ADD TO CART EVENTS =====
-    gridEl.querySelectorAll(".add-to-cart").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const id = btn.dataset.id;
-            const med = medicines.find(m => m.Medicine_id === id);
-            if (!med) return;
-            cart.push(med);
-            showToast(`${med.MedicineName} added to cart. Total items: ${cart.length}`);
-        });
-    });
 }
 
 // ======== FILTER SUMMARY ========
@@ -243,18 +260,375 @@ function init() {
     expiryFilter.addEventListener("change", renderGrid);
     sortSelect.addEventListener("change", renderGrid);
 
-    // ===== CHECKOUT BUTTON =====
-    const checkoutBtn = document.createElement("button");
-    checkoutBtn.textContent = "Checkout";
-    checkoutBtn.className = "btn-primary";
-    checkoutBtn.style.margin = "1rem";
-    checkoutBtn.addEventListener("click", () => {
-        if (cart.length === 0) return showToast("Cart is empty!");
-        let total = cart.reduce((sum, m) => sum + m.price, 0);
-        alert(`Checkout ${cart.length} item(s). Total: $${total.toFixed(2)}`);
-        cart = []; // clear cart
-    });
-    gridEl.parentElement.insertBefore(checkoutBtn, gridEl);
+    // EVENT DELEGATION FOR GRID
+    gridEl.addEventListener("click", handleGridClick);
+
+    // CART POPUP AND CHECKOUT
+    initCartPopup();
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+// ======== GRID CLICK HANDLER ========
+function handleGridClick(e) {
+    const target = e.target;
+    const id = target.dataset.id;
+    const med = medicines.find(m => m.Medicine_id === id);
+    if (!med) return;
+
+    // Increment / Decrement
+    if (target.classList.contains("increment")) {
+        const qtyEl = gridEl.querySelector(`.quantity[data-id="${id}"]`);
+        let current = parseInt(qtyEl.textContent);
+        if (current < med.Quantity) qtyEl.textContent = current + 1;
+    }
+    if (target.classList.contains("decrement")) {
+        const qtyEl = gridEl.querySelector(`.quantity[data-id="${id}"]`);
+        let current = parseInt(qtyEl.textContent);
+        if (current > 1) qtyEl.textContent = current - 1;
+    }
+
+    // Add to Cart
+    if (target.classList.contains("add-to-cart-rounded")) {
+        const qtyEl = gridEl.querySelector(`.quantity[data-id="${id}"]`);
+        let qty = parseInt(qtyEl.textContent);
+
+        let storedCart;
+        try {
+            storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+            if (!Array.isArray(storedCart)) storedCart = [];
+        } catch (e) {
+            storedCart = [];
+        }
+
+        const existing = storedCart.find(item => item.Medicine_id === id);
+        if (existing) {
+            existing.Quantity = Math.min(existing.Quantity + qty, med.Quantity);
+        } else {
+            storedCart.push({
+                Medicine_id: med.Medicine_id,
+                MedicineName: med.MedicineName,
+                price: med.price,
+                Quantity: qty,
+                stock: med.Quantity
+            });
+        }
+
+        localStorage.setItem("cart", JSON.stringify(storedCart));
+        showToast(`${med.MedicineName} added to cart.`);
+        updateCartBadge();
+    }
+}
+function initCartPopup() {
+    const cartContainer = document.createElement("div");
+    cartContainer.style.display = "flex";
+    cartContainer.style.alignItems = "center";
+    cartContainer.style.justifyContent = "flex-end";
+    cartContainer.style.margin = "1rem";
+    cartContainer.style.position = "relative";
+
+    const cartIcon = document.createElement("div");
+    cartIcon.style.position = "relative";
+    cartIcon.style.cursor = "pointer";
+    cartIcon.style.display = "flex";
+    cartIcon.style.alignItems = "center";
+    cartIcon.style.justifyContent = "center";
+    cartIcon.style.width = "56px";
+    cartIcon.style.height = "56px";
+    cartIcon.style.borderRadius = "12px";
+    cartIcon.style.background = "#ffffff";
+    cartIcon.style.border = "2px solid #e5e7eb";
+    cartIcon.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
+    cartIcon.style.transition = "all 0.3s ease-out";
+    cartIcon.style.padding = "12px";
+    
+    cartIcon.innerHTML = `
+        <img src="/static/imgs/shoppingCartIcon.png" alt="Shopping Cart" style="width:32px; height:32px; transition: transform 0.3s ease-out; object-fit: contain;">
+        <span id="cart-count-badge" style="position:absolute; top:-6px; right:-6px; background:#7c3aed; color:white; font-size:0.75rem; font-weight:bold; width:22px; height:22px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.4); border: 2px solid white;">0</span>
+    `;
+
+    // Add hover effect
+    cartIcon.addEventListener("mouseenter", () => {
+        cartIcon.style.background = "#f9fafb";
+        cartIcon.style.borderColor = "#7c3aed";
+        cartIcon.style.boxShadow = "0 4px 12px rgba(124, 58, 237, 0.2)";
+        cartIcon.style.transform = "translateY(-2px)";
+        const img = cartIcon.querySelector("img");
+        if (img) img.style.transform = "scale(1.1)";
+    });
+
+    cartIcon.addEventListener("mouseleave", () => {
+        cartIcon.style.background = "#ffffff";
+        cartIcon.style.borderColor = "#e5e7eb";
+        cartIcon.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
+        cartIcon.style.transform = "translateY(0)";
+        const img = cartIcon.querySelector("img");
+        if (img) img.style.transform = "scale(1)";
+    });
+
+    // Create backdrop overlay for blur effect
+    const backdrop = document.createElement("div");
+    backdrop.style.position = "fixed";
+    backdrop.style.top = "0";
+    backdrop.style.left = "0";
+    backdrop.style.width = "100%";
+    backdrop.style.height = "100%";
+    backdrop.style.background = "rgba(0, 0, 0, 0.5)";
+    backdrop.style.backdropFilter = "blur(4px)";
+    backdrop.style.webkitBackdropFilter = "blur(4px)";
+    backdrop.style.zIndex = "9999";
+    backdrop.style.display = "none";
+    backdrop.addEventListener("click", () => {
+        cartPopup.style.display = "none";
+        backdrop.style.display = "none";
+    });
+
+    const cartPopup = document.createElement("div");
+    cartPopup.style.position = "fixed";
+    cartPopup.style.top = "50%";
+    cartPopup.style.left = "50%";
+    cartPopup.style.transform = "translate(-50%, -50%)";
+    cartPopup.style.width = "400px";
+    cartPopup.style.maxHeight = "80%";
+    cartPopup.style.overflowY = "auto";
+    cartPopup.style.background = "#7c3aed";
+    cartPopup.style.color = "white";
+    cartPopup.style.padding = "1rem";
+    cartPopup.style.borderRadius = "12px";
+    cartPopup.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+    cartPopup.style.display = "none";
+    cartPopup.style.zIndex = "10000";
+
+    const popupHeader = document.createElement("div");
+    popupHeader.style.display = "flex";
+    popupHeader.style.justifyContent = "space-between";
+    popupHeader.style.alignItems = "center";
+    popupHeader.style.marginBottom = "1rem";
+    popupHeader.innerHTML = `<h3>Cart</h3><button style="background:#dc2626; border:none; color:white; padding:0.2rem 0.5rem; border-radius:6px; cursor:pointer;">&times;</button>`;
+    const closeBtn = popupHeader.querySelector("button");
+    closeBtn.addEventListener("click", () => {
+        cartPopup.style.display = "none";
+        backdrop.style.display = "none";
+    });
+    cartPopup.appendChild(popupHeader);
+
+    const cartItemsContainer = document.createElement("div");
+    cartPopup.appendChild(cartItemsContainer);
+
+    // Total section
+    const totalSection = document.createElement("div");
+    totalSection.style.marginTop = "1rem";
+    totalSection.style.paddingTop = "1rem";
+    totalSection.style.borderTop = "2px solid rgba(255,255,255,0.3)";
+    totalSection.style.display = "flex";
+    totalSection.style.justifyContent = "space-between";
+    totalSection.style.alignItems = "center";
+    totalSection.style.fontSize = "1.2rem";
+    totalSection.style.fontWeight = "bold";
+    const totalLabel = document.createElement("span");
+    totalLabel.textContent = "Total:";
+    const totalAmount = document.createElement("span");
+    totalAmount.id = "cart-total-amount";
+    totalAmount.textContent = "$0.00";
+    totalSection.appendChild(totalLabel);
+    totalSection.appendChild(totalAmount);
+    cartPopup.appendChild(totalSection);
+
+    const checkoutPopupBtn = document.createElement("button");
+    checkoutPopupBtn.textContent = "Checkout";
+    checkoutPopupBtn.style.marginTop = "1rem";
+    checkoutPopupBtn.style.width = "100%";
+    checkoutPopupBtn.style.background = "white";
+    checkoutPopupBtn.style.color = "black";
+    checkoutPopupBtn.style.fontWeight = "bold";
+    checkoutPopupBtn.style.border = "none";
+    checkoutPopupBtn.style.borderRadius = "8px";
+    checkoutPopupBtn.style.padding = "12px";
+    checkoutPopupBtn.style.cursor = "pointer";
+    checkoutPopupBtn.style.fontSize = "1rem";
+    checkoutPopupBtn.style.textAlign = "center";
+    checkoutPopupBtn.style.transition = "background 0.2s ease-out";
+    checkoutPopupBtn.addEventListener("mouseenter", () => {
+        checkoutPopupBtn.style.background = "#f3f4f6";
+    });
+    checkoutPopupBtn.addEventListener("mouseleave", () => {
+        checkoutPopupBtn.style.background = "white";
+    });
+    checkoutPopupBtn.addEventListener("click", () => {
+        const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        if (storedCart.length === 0) return showToast("Cart is empty!");
+        window.location.href = "/payment-page";
+    });
+    cartPopup.appendChild(checkoutPopupBtn);
+
+    cartIcon.addEventListener("click", () => {
+        renderCartPopup();
+        backdrop.style.display = "block";
+        cartPopup.style.display = "block";
+    });
+
+    function calculateTotal(cart) {
+        return cart.reduce((sum, item) => sum + (item.price * item.Quantity), 0);
+    }
+
+    function updateTotal() {
+        const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        const total = calculateTotal(storedCart);
+        const totalAmountEl = document.getElementById("cart-total-amount");
+        if (totalAmountEl) {
+            totalAmountEl.textContent = `$${total.toFixed(2)}`;
+        }
+    }
+
+    function renderCartPopup() {
+        const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        cartItemsContainer.innerHTML = "";
+        if (storedCart.length === 0) {
+            cartItemsContainer.innerHTML = `<p style="text-align:center;">Cart is empty</p>`;
+            updateTotal();
+            return;
+        }
+
+        storedCart.forEach(item => {
+            const medRow = document.createElement("div");
+            medRow.style.display = "flex";
+            medRow.style.flexDirection = "column";
+            medRow.style.marginBottom = "0.75rem";
+            medRow.style.background = "rgba(255,255,255,0.1)";
+            medRow.style.padding = "0.6rem";
+            medRow.style.borderRadius = "6px";
+
+            const itemInfo = document.createElement("div");
+            itemInfo.style.display = "flex";
+            itemInfo.style.justifyContent = "space-between";
+            itemInfo.style.alignItems = "center";
+            itemInfo.style.marginBottom = "0.5rem";
+
+            const itemDetails = document.createElement("div");
+            itemDetails.style.flex = "1";
+            itemDetails.innerHTML = `
+                <strong style="display:block; margin-bottom:0.25rem;">${item.MedicineName}</strong>
+                <span style="font-size:0.9rem; opacity:0.9;">$${item.price.toFixed(2)} each</span>
+            `;
+
+            const itemControls = document.createElement("div");
+            itemControls.style.display = "flex";
+            itemControls.style.alignItems = "center";
+            itemControls.style.gap = "8px";
+
+            const qtyControls = document.createElement("div");
+            qtyControls.style.display = "flex";
+            qtyControls.style.alignItems = "center";
+            qtyControls.style.gap = "8px";
+            qtyControls.style.marginRight = "8px";
+
+            const decreaseBtn = document.createElement("button");
+            decreaseBtn.className = "decrease";
+            decreaseBtn.textContent = "-";
+            decreaseBtn.style.background = "#6b21a8";
+            decreaseBtn.style.color = "white";
+            decreaseBtn.style.border = "none";
+            decreaseBtn.style.borderRadius = "50%";
+            decreaseBtn.style.width = "28px";
+            decreaseBtn.style.height = "28px";
+            decreaseBtn.style.fontWeight = "bold";
+            decreaseBtn.style.cursor = "pointer";
+
+            const qtySpan = document.createElement("span");
+            qtySpan.className = "item-quantity";
+            qtySpan.textContent = item.Quantity;
+            qtySpan.style.minWidth = "30px";
+            qtySpan.style.textAlign = "center";
+
+            const increaseBtn = document.createElement("button");
+            increaseBtn.className = "increase";
+            increaseBtn.textContent = "+";
+            increaseBtn.style.background = "#6b21a8";
+            increaseBtn.style.color = "white";
+            increaseBtn.style.border = "none";
+            increaseBtn.style.borderRadius = "50%";
+            increaseBtn.style.width = "28px";
+            increaseBtn.style.height = "28px";
+            increaseBtn.style.fontWeight = "bold";
+            increaseBtn.style.cursor = "pointer";
+
+            const itemPrice = document.createElement("div");
+            itemPrice.className = "item-total-price";
+            itemPrice.style.fontWeight = "bold";
+            itemPrice.style.fontSize = "1rem";
+            itemPrice.textContent = `$${(item.price * item.Quantity).toFixed(2)}`;
+
+            const removeBtn = document.createElement("button");
+            removeBtn.className = "remove";
+            removeBtn.textContent = "×";
+            removeBtn.style.padding = "2px 8px";
+            removeBtn.style.background = "#dc2626";
+            removeBtn.style.border = "none";
+            removeBtn.style.borderRadius = "6px";
+            removeBtn.style.color = "white";
+            removeBtn.style.cursor = "pointer";
+            removeBtn.style.fontSize = "1.2rem";
+
+            qtyControls.appendChild(decreaseBtn);
+            qtyControls.appendChild(qtySpan);
+            qtyControls.appendChild(increaseBtn);
+            itemControls.appendChild(qtyControls);
+            itemControls.appendChild(itemPrice);
+            itemControls.appendChild(removeBtn);
+
+            itemInfo.appendChild(itemDetails);
+            itemInfo.appendChild(itemControls);
+
+            medRow.appendChild(itemInfo);
+
+            decreaseBtn.addEventListener("click", () => {
+                if (item.Quantity > 1) {
+                    item.Quantity--;
+                    qtySpan.textContent = item.Quantity;
+                    itemPrice.textContent = `$${(item.price * item.Quantity).toFixed(2)}`;
+                    updateCartStorage(storedCart);
+                    updateTotal();
+                }
+            });
+            increaseBtn.addEventListener("click", () => {
+                if (item.Quantity < item.stock) {
+                    item.Quantity++;
+                    qtySpan.textContent = item.Quantity;
+                    itemPrice.textContent = `$${(item.price * item.Quantity).toFixed(2)}`;
+                    updateCartStorage(storedCart);
+                    updateTotal();
+                }
+            });
+            removeBtn.addEventListener("click", () => {
+                const idx = storedCart.findIndex(c => c.Medicine_id === item.Medicine_id);
+                if (idx !== -1) storedCart.splice(idx, 1);
+                updateCartStorage(storedCart);
+                renderCartPopup();
+            });
+
+            cartItemsContainer.appendChild(medRow);
+        });
+
+        updateTotal();
+    }
+
+    function updateCartStorage(updatedCart) {
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        updateCartBadge();
+        updateTotal();
+    }
+
+    const cartCountBadge = cartIcon.querySelector("#cart-count-badge");
+    function updateCartBadge() {
+        const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+        const totalQty = storedCart.reduce((sum, item) => sum + item.Quantity, 0);
+        cartCountBadge.textContent = totalQty;
+    }
+
+    cartContainer.appendChild(cartIcon);
+    document.body.appendChild(backdrop);
+    document.body.appendChild(cartPopup);
+    gridEl.parentElement.insertBefore(cartContainer, gridEl);
+    updateCartBadge();
+    updateTotal();
+}
