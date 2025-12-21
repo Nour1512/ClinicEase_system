@@ -1,402 +1,244 @@
-// Doctors Page - Simple Implementation
-console.log('Doctors page script loaded');
-
-// Wait for page to load
-window.onload = function() {
-    console.log('Page loaded, initializing...');
-    initializePage();
-};
-
-// Main initialization function
-function initializePage() {
-    try {
-        // Setup all event listeners
-        setupEventListeners();
-        
-        // Update counters
-        updateDoctorCount();
-        
-        console.log('Page initialized successfully');
-    } catch (error) {
-        console.error('Error during initialization:', error);
-        showError('Failed to initialize page');
+class Doctor {
+    constructor(doctor_id, full_name, specialty, phone, availability, rating, email, price) {
+        this.doctor_id = doctor_id;
+        this.full_name = full_name;
+        this.specialty = specialty;
+        this.phone = phone;
+        this.availability = availability;
+        this.rating = rating || 0.0;
+        this.email = email;
+        this.price = price || 0.0;
     }
-}
 
-// Setup all event listeners
-function setupEventListeners() {
-    console.log('Setting up event listeners...');
-    
-    // Book appointment buttons (event delegation)
-    document.addEventListener('click', function(event) {
-        const bookButton = event.target.closest('.book-btn');
-        if (bookButton) {
-            event.preventDefault();
-            handleBookAppointment(bookButton);
-        }
-        
-        // Navigation links
-        const navLink = event.target.closest('.nav-link');
-        if (navLink) {
-            event.preventDefault();
-            handleNavigation(navLink);
-        }
-    });
-    
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', handleSearch);
-    }
-    
-    // Filter functionality
-    const specialtyFilter = document.getElementById('specialtyFilter');
-    if (specialtyFilter) {
-        specialtyFilter.addEventListener('change', handleFilter);
-    }
-    
-    // Sort functionality
-    const sortSelect = document.getElementById('sortBy');
-    if (sortSelect) {
-        sortSelect.addEventListener('change', handleSort);
-    }
-    
-    // Logout button
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            handleLogout();
-        });
-    }
-    
-    console.log('Event listeners setup complete');
-}
-
-// Handle book appointment
-function handleBookAppointment(button) {
-    const doctorId = button.getAttribute('data-id');
-    const doctorCard = button.closest('.doctor-card');
-    const doctorName = doctorCard.querySelector('.doctor-name').textContent;
-    
-    console.log('Booking appointment with doctor ID:', doctorId);
-    
-    // Disable button during booking
-    const originalText = button.innerHTML;
-    button.disabled = true;
-    button.innerHTML = '<span class="spinner"></span> Booking...';
-    
-    // Add spinner styles if not exists
-    if (!document.querySelector('#spinner-style')) {
-        const style = document.createElement('style');
-        style.id = 'spinner-style';
-        style.textContent = `
-            .spinner {
-                display: inline-block;
-                width: 16px;
-                height: 16px;
-                border: 2px solid #ffffff;
-                border-radius: 50%;
-                border-top-color: transparent;
-                animation: spin 0.8s linear infinite;
-                margin-right: 8px;
-            }
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    // Simulate API call
-    setTimeout(function() {
-        // Re-enable button
-        button.disabled = false;
-        button.innerHTML = originalText;
-        
-        // Show success message
-        showSuccess('Appointment request sent to ' + doctorName + '! You will be contacted soon.');
-        
-        console.log('Appointment booked successfully for doctor ID:', doctorId);
-    }, 2000);
-}
-
-// Handle search
-function handleSearch(event) {
-    const searchTerm = event.target.value.toLowerCase().trim();
-    console.log('Searching for:', searchTerm);
-    
-    const doctorCards = document.querySelectorAll('.doctor-card');
-    let visibleCount = 0;
-    
-    doctorCards.forEach(function(card) {
-        const doctorName = card.querySelector('.doctor-name').textContent.toLowerCase();
-        const specialty = card.querySelector('.doctor-specialty').textContent.toLowerCase();
-        
-        if (doctorName.includes(searchTerm) || specialty.includes(searchTerm)) {
-            card.style.display = 'block';
-            visibleCount++;
-        } else {
-            card.style.display = 'none';
-        }
-    });
-    
-    updateDoctorCount(visibleCount);
-}
-
-// Handle filter
-function handleFilter(event) {
-    const filterValue = event.target.value.toLowerCase();
-    console.log('Filtering by:', filterValue);
-    
-    const doctorCards = document.querySelectorAll('.doctor-card');
-    let visibleCount = 0;
-    
-    doctorCards.forEach(function(card) {
-        const specialty = card.querySelector('.doctor-specialty').textContent.toLowerCase();
-        
-        if (filterValue === 'all' || filterValue === '' || specialty.includes(filterValue)) {
-            card.style.display = 'block';
-            visibleCount++;
-        } else {
-            card.style.display = 'none';
-        }
-    });
-    
-    updateDoctorCount(visibleCount);
-}
-
-// Handle sort
-function handleSort(event) {
-    const sortValue = event.target.value;
-    console.log('Sorting by:', sortValue);
-    
-    const gridContainer = document.getElementById('doctorsGrid');
-    if (!gridContainer) return;
-    
-    const doctorCards = Array.from(gridContainer.querySelectorAll('.doctor-card'));
-    
-    doctorCards.sort(function(a, b) {
-        const priceA = parseInt(a.querySelector('.price').textContent.replace('$', '') || 0);
-        const priceB = parseInt(b.querySelector('.price').textContent.replace('$', '') || 0);
-        const nameA = a.querySelector('.doctor-name').textContent;
-        const nameB = b.querySelector('.doctor-name').textContent;
-        
-        switch(sortValue) {
-            case 'price-low':
-                return priceA - priceB;
-            case 'price-high':
-                return priceB - priceA;
-            case 'name':
-                return nameA.localeCompare(nameB);
-            case 'rating':
-                // For rating, you would need to extract it from the card
-                return 0;
-            default:
-                return 0;
-        }
-    });
-    
-    // Reorder cards in the grid
-    doctorCards.forEach(function(card) {
-        gridContainer.appendChild(card);
-    });
-}
-
-// Handle navigation
-function handleNavigation(link) {
-    const page = link.getAttribute('href');
-    const pageName = link.textContent.trim();
-    
-    console.log('Navigating to:', pageName);
-    
-    // Remove active class from all links
-    document.querySelectorAll('.nav-link').forEach(function(navLink) {
-        navLink.classList.remove('active');
-    });
-    
-    // Add active class to clicked link
-    link.classList.add('active');
-    
-    // Show loading message for non-current pages
-    if (page && page !== window.location.pathname && page !== '#') {
-        showInfo('Loading ' + pageName + '...');
-    }
-}
-
-// Handle logout
-function handleLogout() {
-    console.log('Logging out...');
-    showInfo('Logging out... Please wait.');
-    
-    setTimeout(function() {
-        window.location.href = '/logout';
-    }, 1500);
-}
-
-// Update doctor count
-function updateDoctorCount(count) {
-    const totalElement = document.getElementById('totalDoctors');
-    const countElement = document.getElementById('totalDoctorsCount');
-    
-    if (!totalElement || !countElement) return;
-    
-    if (count !== undefined) {
-        totalElement.textContent = count;
-        countElement.textContent = count;
-    } else {
-        const doctorCards = document.querySelectorAll('.doctor-card');
-        const visibleCards = Array.from(doctorCards).filter(card => 
-            card.style.display !== 'none'
+    static from_dict(data) {
+        return new Doctor(
+            data.doctor_id,
+            data.full_name,
+            data.specialty,
+            data.phone,
+            data.availability,
+            data.rating,
+            data.email,
+            data.price
         );
-        const finalCount = visibleCards.length || doctorCards.length;
-        totalElement.textContent = finalCount;
-        countElement.textContent = finalCount;
+    }
+
+    isAvailable() {
+        return this.availability && this.availability.toLowerCase().includes('available');
+    }
+
+    getAvailabilityStatus() {
+        if (!this.availability) return "unknown";
+        const avail = this.availability.toLowerCase();
+        if (avail.includes('available') || avail.includes('free')) return "available";
+        if (avail.includes('busy') || avail.includes('occupied')) return "busy";
+        return "unknown";
     }
 }
 
-// Notification functions
-function showSuccess(message) {
-    showNotification(message, 'success');
-}
+// ======== DOM ELEMENTS ========
+const gridEl = document.getElementById("doctorGrid");
+const searchInput = document.getElementById("searchInput");
+const specialtyFilter = document.getElementById("specialtyFilter");
+const availabilityFilter = document.getElementById("availabilityFilter");
+const sortSelect = document.getElementById("sortSelect");
+const doctorCountPill = document.getElementById("doctorCountPill");
+const doctorCountSubtitle = document.getElementById("doctorCountSubtitle");
+const filterSummary = document.getElementById("filterSummary");
+const toast = document.getElementById("toast");
+const toastMessage = document.getElementById("toastMessage");
 
-function showError(message) {
-    showNotification(message, 'error');
-}
+// API URL
+const API_LIST_URL = gridEl.dataset.apiUrl;
 
-function showInfo(message) {
-    showNotification(message, 'info');
-}
+let doctors = [];
 
-function showMessage(message) {
-    showNotification(message, 'message');
-}
-
-// Show notification
-function showNotification(message, type) {
-    // Remove existing notification
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-    
-    // Create notification
-    const notification = document.createElement('div');
-    notification.className = 'notification notification-' + type;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-icon">${getNotificationIcon(type)}</span>
-            <span class="notification-text">${message}</span>
-        </div>
-        <button class="notification-close">×</button>
-    `;
-    
-    // Add close event listener
-    notification.querySelector('.notification-close').addEventListener('click', function() {
-        notification.remove();
-    });
-    
-    // Add styles if not exists
-    if (!document.querySelector('#notification-styles')) {
-        const style = document.createElement('style');
-        style.id = 'notification-styles';
-        style.textContent = `
-            .notification {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: white;
-                border-radius: 8px;
-                padding: 15px 20px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 1000;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                min-width: 300px;
-                max-width: 400px;
-                animation: slideIn 0.3s ease-out;
-                border-left: 4px solid #3594A9;
-            }
-            
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            
-            .notification-success {
-                border-left-color: #10b981;
-            }
-            
-            .notification-error {
-                border-left-color: #dc2626;
-            }
-            
-            .notification-info {
-                border-left-color: #3594A9;
-            }
-            
-            .notification-content {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                flex: 1;
-            }
-            
-            .notification-icon {
-                font-size: 20px;
-            }
-            
-            .notification-text {
-                font-size: 14px;
-                color: #374151;
-            }
-            
-            .notification-close {
-                background: none;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                color: #6b7280;
-                padding: 0;
-                margin-left: 15px;
-                line-height: 1;
-            }
-            
-            .notification-close:hover {
-                color: #374151;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    document.body.appendChild(notification);
-    
-    // Auto remove after 5 seconds
-    setTimeout(function() {
-        if (notification.parentNode) {
-            notification.remove();
+// ======== LOAD DOCTORS ========
+async function loadDoctors() {
+    try {
+        if (!API_LIST_URL || API_LIST_URL === 'undefined') {
+            console.error("API_LIST_URL is not defined");
+            showToast("Configuration error: API URL not set. Please refresh the page.");
+            return;
         }
-    }, 5000);
-}
-
-// Get notification icon
-function getNotificationIcon(type) {
-    switch(type) {
-        case 'success': return '✅';
-        case 'error': return '❌';
-        case 'info': return 'ℹ';
-        default: return '📢';
+        
+        const res = await fetch(API_LIST_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        
+        const data = await res.json();
+        if (data.success && Array.isArray(data.doctors)) {
+            doctors = data.doctors.map(Doctor.from_dict);
+            renderSpecialtyFilter();
+            renderGrid();
+        } else if (Array.isArray(data)) {
+            // Fallback if API returns array directly
+            doctors = data.map(Doctor.from_dict);
+            renderSpecialtyFilter();
+            renderGrid();
+        }
+    } catch (err) {
+        console.error("Error loading doctors:", err);
+        showToast("Failed to load doctors.");
+        gridEl.innerHTML = `<div style="text-align: center; padding: 2rem; color: #dc2626;">
+            <p><strong>Error loading doctors</strong></p>
+        </div>`;
     }
 }
 
-// Initialize the page when script loads
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-        initializePage();
+// ======== FILTER ========
+function renderSpecialtyFilter() {
+    specialtyFilter.innerHTML = '<option value="">All Specialties</option>';
+    const specialties = Array.from(new Set(doctors.map(d => d.specialty).filter(s => s))).sort();
+    specialties.forEach(specialty => {
+        const opt = document.createElement("option");
+        opt.value = specialty;
+        opt.textContent = specialty;
+        specialtyFilter.appendChild(opt);
     });
-} else {
-    // DOM is already ready
-    initializePage();
 }
+
+// ======== FILTER & SORT ========
+function filteredAndSortedDoctors() {
+    let result = [...doctors];
+    const q = searchInput.value.trim().toLowerCase();
+    if (q) {
+        result = result.filter(d =>
+            d.full_name.toLowerCase().includes(q) ||
+            d.specialty.toLowerCase().includes(q) ||
+            (d.email && d.email.toLowerCase().includes(q))
+        );
+    }
+    if (specialtyFilter.value) {
+        result = result.filter(d => d.specialty === specialtyFilter.value);
+    }
+    if (availabilityFilter.value) {
+        if (availabilityFilter.value === "available") {
+            result = result.filter(d => d.getAvailabilityStatus() === "available");
+        } else if (availabilityFilter.value === "busy") {
+            result = result.filter(d => d.getAvailabilityStatus() === "busy");
+        }
+    }
+
+    const sortValue = sortSelect.value;
+    result.sort((a, b) => {
+        switch (sortValue) {
+            case "name-asc": return a.full_name.localeCompare(b.full_name);
+            case "name-desc": return b.full_name.localeCompare(a.full_name);
+            case "rating-asc": return a.rating - b.rating;
+            case "rating-desc": return b.rating - a.rating;
+            case "price-asc": return a.price - b.price;
+            case "price-desc": return b.price - a.price;
+            default: return 0;
+        }
+    });
+    return result;
+}
+
+// ======== RENDER GRID ========
+function renderGrid() {
+    const data = filteredAndSortedDoctors();
+    gridEl.innerHTML = "";
+
+    data.forEach(doctor => {
+        const card = document.createElement("div");
+        card.className = "medicine-card-container";
+        card.style.border = "1px solid #e5e7eb";
+        card.style.borderRadius = "12px";
+        card.style.padding = "1rem";
+        card.style.marginBottom = "1.5rem";
+        card.style.display = "flex";
+        card.style.flexDirection = "column";
+        card.style.alignItems = "center";
+        card.style.background = "white";
+        card.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08)";
+
+        const availabilityStatus = doctor.getAvailabilityStatus();
+        const availabilityText =
+            availabilityStatus === "available" ? "Available" :
+            availabilityStatus === "busy" ? "Busy" : "";
+        const availabilityClass =
+            availabilityStatus === "available" ? "stock-healthy" :
+            availabilityStatus === "busy" ? "stock-low" : "stock-critical";
+
+        const initialLetter = doctor.full_name.charAt(0).toUpperCase();
+        const ratingStars = "⭐".repeat(Math.floor(doctor.rating)) + (doctor.rating % 1 >= 0.5 ? "½" : "");
+
+        const details = document.createElement("div");
+        details.style.display = "flex";
+        details.style.flexDirection = "column";
+        details.style.alignItems = "center";
+        details.style.gap = "8px";
+        
+        let availabilityBadgeHTML = '';
+        if (availabilityText) {
+            availabilityBadgeHTML = `<div style="margin-top:4px; font-size:0.9rem; padding:2px 8px; border-radius:999px; background: ${availabilityStatus === 'available' ? '#dcfce7' : '#fee2e2'}; color: ${availabilityStatus === 'available' ? '#15803d' : '#b91c1c'};">
+                ${availabilityText}
+            </div>`;
+        }
+        
+        details.innerHTML = `
+            <div class="badge-id">ID: ${doctor.doctor_id}</div>
+            <div class="medicine-card-header" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                <div class="medicine-avatar" style="width:50px; height:50px; border-radius:50%; background:#7c3aed; color:white; display:flex; justify-content:center; align-items:center; font-weight:bold;">${initialLetter}</div>
+                <div style="text-align:center;">
+                    <div class="medicine-title" style="font-weight:bold; font-size:1.1rem;">${doctor.full_name}</div>
+                    <div class="medicine-subtitle" style="font-size:0.9rem; color:#4b5563;">${doctor.specialty || 'General Practitioner'}</div>
+                </div>
+            </div>
+            <div class="medicine-meta" style="margin-top:4px; font-size:0.95rem; text-align:center;">
+                <span>Rating: <strong>${doctor.rating.toFixed(1)}</strong> ${ratingStars}</span> | 
+                <span>Price: <strong>$${doctor.price.toFixed(2)}</strong></span>
+            </div>
+            ${availabilityBadgeHTML}
+            <div class="stock-status ${availabilityClass}" style="margin-top:4px; font-size:0.9rem;">
+                ${doctor.availability || 'Not specified'}
+            </div>
+        `;
+
+        card.appendChild(details);
+        gridEl.appendChild(card);
+    });
+
+    doctorCountPill.textContent = `${data.length} doctor${data.length !== 1 ? "s" : ""}`;
+    doctorCountSubtitle.textContent = `Total in system: ${doctors.length}`;
+    filterSummary.textContent = buildFilterSummary(data.length);
+}
+
+// ======== FILTER SUMMARY ========
+function buildFilterSummary(currentCount) {
+    const parts = [];
+    const spec = specialtyFilter.value;
+    const avail = availabilityFilter.value;
+    const q = searchInput.value.trim();
+    if (!spec && !avail && !q) return "Showing all doctors";
+    if (q) parts.push(`matching "${q}"`);
+    if (spec) parts.push(`specialty: ${spec}`);
+    if (avail === "available") parts.push("available");
+    else if (avail === "busy") parts.push("busy");
+    return `Showing ${currentCount} doctor${currentCount !== 1 ? "s" : ""} ${parts.join(", ")}`;
+}
+
+// ======== TOAST ========
+let toastTimeout;
+function showToast(message) {
+    toastMessage.textContent = message;
+    toast.classList.remove("hidden");
+    toast.classList.add("visible");
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove("visible");
+        toast.classList.add("hidden");
+    }, 3500);
+}
+
+// ======== INIT ========
+function init() {
+    loadDoctors();
+
+    searchInput.addEventListener("input", renderGrid);
+    specialtyFilter.addEventListener("change", renderGrid);
+    availabilityFilter.addEventListener("change", renderGrid);
+    sortSelect.addEventListener("change", renderGrid);
+}
+
+document.addEventListener("DOMContentLoaded", init);
