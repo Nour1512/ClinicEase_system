@@ -707,7 +707,8 @@ function closeModal() {
 // SUBMIT NEW PATIENT
 async function submitNewPatient(e) {
     e.preventDefault();
-    
+    console.log("submitNewPatient handler fired");
+
     const formData = new FormData(newPatientForm);
     const patientData = {
         full_name: formData.get("full_name"),
@@ -726,7 +727,8 @@ async function submitNewPatient(e) {
         });
         
         if (!res.ok) {
-            const error = await res.json();
+            let error = { error: `HTTP ${res.status}` };
+            try { error = await res.json(); } catch (_) { /* ignore */ }
             throw new Error(error.error || "Failed to add patient");
         }
         
