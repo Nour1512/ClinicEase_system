@@ -3,12 +3,9 @@ $(function () {
   // SUCCESS SOUND
   // ----------------------------
   const successSound = new Audio(
-    "data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/8AAEQgAeAC0BACIAAANIAQAACAADEAAAAAgACAAAEAAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI"
+    "data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/8AAEQgAeAC0BACIAAANIAQAACAADEAAAAAgACAAAEAAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI"
   );
 
-  // ----------------------------
-  // CARD TYPES
-  // ----------------------------
   const cards = [
     { name: "mastercard", color: "#960d0dff", src: "/static/imgs/Mastercard-logo.png"},
     { name: "visa",        color: "#eeff07ff", src: "/static/imgs/visa.jpg"},
@@ -29,15 +26,9 @@ $(function () {
       $(".card").css("transform", "rotateY(0deg)");
       $(".seccode").css("color", "var(--text-color)");
     }
-    if (!$(e.target).closest(".expire").length) {
-      $(".date_value").css("color", "var(--text-color)");
-    }
-    if (!$(e.target).closest(".number").length) {
-      $(".card_number").css("color", "var(--text-color)");
-    }
-    if (!$(e.target).closest(".inputname").length) {
-      $(".fullname").css("color", "var(--text-color)");
-    }
+    if (!$(e.target).closest(".expire").length) $(".date_value").css("color", "var(--text-color)");
+    if (!$(e.target).closest(".number").length) $(".card_number").css("color", "var(--text-color)");
+    if (!$(e.target).closest(".inputname").length) $(".fullname").css("color", "var(--text-color)");
   });
 
   // ----------------------------
@@ -50,7 +41,6 @@ $(function () {
       $(this).val(formatted);
       $(".card_number").text(formatted || "●●●● ●●●● ●●●● ●●●●");
 
-      // detect card
       selected_card = -1;
       if (/^5[1-5]/.test(raw)) selected_card = 0;
       else if (/^4/.test(raw)) selected_card = 1;
@@ -67,49 +57,25 @@ $(function () {
         $(".bankid").hide().attr("src", "");
       }
     })
-    .focus(function () {
-      $(".card_number").css("color", "white");
-    });
+    .focus(function () { $(".card_number").css("color", "white"); });
 
-  // ----------------------------
-  // CARDHOLDER NAME
-  // ----------------------------
   $(".inputname")
-    .on("input", function () {
-      $(".fullname").text($(this).val().trim() || "FULL NAME");
-    })
-    .focus(function () {
-      $(".fullname").css("color", "white");
-    });
+    .on("input", function () { $(".fullname").text($(this).val().trim() || "FULL NAME"); })
+    .focus(function () { $(".fullname").css("color", "white"); });
 
-  // ----------------------------
-  // EXPIRY DATE
-  // FIXED: supports MM / YYYY cleanly
-  // ----------------------------
   $(".expire")
     .on("input", function () {
       let v = $(this).val().replace(/\D/g, "");
       let formatted = "";
-
       if (v.length >= 2) {
         formatted = v.substring(0, 2) + " / ";
-        if (v.length > 2) {
-          formatted += v.substring(2, 6);
-        }
-      } else {
-        formatted = v;
-      }
-
+        if (v.length > 2) formatted += v.substring(2, 6);
+      } else formatted = v;
       $(this).val(formatted);
       $(".date_value").text(formatted || "MM / YYYY");
     })
-    .focus(function () {
-      $(".date_value").css("color", "white");
-    });
+    .focus(function () { $(".date_value").css("color", "white"); });
 
-  // ----------------------------
-  // CVV
-  // ----------------------------
   $(".ccv")
     .on("input", function () {
       const code = $(this).val().replace(/\D/g, "").substring(0, 3);
@@ -126,80 +92,97 @@ $(function () {
     });
 
   // ----------------------------
-  // PAY BUTTON
+  // PAY BUTTON & LOCALSTORAGE CART
   // ----------------------------
-  $(".buy").off("click").on("click", function (e) {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  let total = 0;
+  cart.forEach(item => total += item.price * item.Quantity);
+
+  const payButton = $("#pay-button");
+  const amountInput = $("#amount");
+  payButton.html(`<i class="material-icons">lock</i> Pay ${total.toFixed(2)} EGP`);
+  amountInput.val(total.toFixed(2));
+
+  $(".buy").off("click").on("click", async function (e) {
     e.preventDefault();
+
+    if (cart.length === 0) return alert("Cart is empty!");
 
     const cardNum = $(".number").val().replace(/\s/g, "");
     const name = $(".inputname").val().trim();
     const expiry = $(".expire").val();
     const cvv = $(".ccv").val();
     const purchaseId = $("#purchase_id").val();
-    // const amount = parseFloat($("#amount").val());
-    const amount = 50.20; // hardcoded for demo purposes
-
-    const $container = $(".container");
-    const $card = $(".card");
-    const $btn = $(this);
 
     const valid =
-      cardNum.length >= 13 &&
-      cardNum.length <= 19 &&
+      cardNum.length >= 13 && cardNum.length <= 19 &&
       name !== "" &&
       /^\d{2} \/ \d{4}$/.test(expiry) &&
       /^\d{3}$/.test(cvv) &&
       purchaseId;
 
-    if (!valid) return showError("Please fill all fields correctly.");
+    if (!valid) return alert("Please fill all fields correctly.");
 
-    $.ajax({
-      url: "/payments/create",
-      method: "POST",
-      data: {
-        purchase_id: purchaseId,
-        card_number: cardNum,
-        cardholder_name: name,
-        expiry_date: expiry,
-        cvv: cvv,
-        amount: amount,
-      },
-      success: function (res) {
-        if (res.success) {
-          successSound.play().catch(() => {});
-          $card.addClass("card-orbit");
-          $btn.text("Paid!");
-
-
-          setTimeout(() => {
-            $card.removeClass("card-orbit");
-
-            // reset transform (VERY IMPORTANT)
-            $card.css("transform", "rotateY(0deg)");
-          }, 1600);
-
-          // redirect later
-          setTimeout(() => {
-            window.location.href = res.redirect_url;
-          }, 2200);
-          // setTimeout(() => window.location.href = res.redirect_url, 2000);
-        } else {
-          showError(res.message);
+    try {
+      // Call the /buy API for each item
+      for (const item of cart) {
+        const res = await fetch(`/pharmacy/api/medicines/${item.Medicine_id}/buy`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ qty: item.Quantity })
+        });
+        const data = await res.json();
+        if (!data.ok) {
+          alert(`Failed to buy medicine ID ${item.Medicine_id}: ${data.error}`);
+          return;
         }
-      },
-      error: function () {
-        showError("Network error. Please try again.");
-      },
-    });
+      }
+
+      // Now call your payments/create endpoint
+      $.ajax({
+        url: "/payments/create",
+        method: "POST",
+        data: {
+          purchase_id: purchaseId,
+          card_number: cardNum,
+          cardholder_name: name,
+          expiry_date: expiry,
+          cvv: cvv,
+          amount: total.toFixed(2)
+        },
+        success: function(res) {
+          if (res.success) {
+            successSound.play().catch(() => {});
+            $(".card").addClass("card-orbit");
+            payButton.text("Paid!");
+            localStorage.removeItem("cart");
+
+            setTimeout(() => {
+              $(".card").removeClass("card-orbit").css("transform", "rotateY(0deg)");
+            }, 1600);
+
+            setTimeout(() => {
+              window.location.href = res.redirect_url;
+            }, 2200);
+          } else {
+            showError(res.message);
+          }
+        },
+        error: function() { showError("Network error. Please try again."); }
+      });
+
+    } catch (err) {
+      console.error("Payment failed:", err);
+      alert("Payment failed. Please try again.");
+    }
 
     function showError(msg) {
-      $container.addClass("purchase-failed");
-      $btn.text("Failed!");
-
+      $(".container").addClass("purchase-failed");
+      payButton.text("Failed!");
       setTimeout(() => {
-        $card.removeClass("card-orbit");
-        $btn.text(`Pay ${amount} EGP`);
-        $container.removeClass("purchase-failed");
+        $(".card").css("transform", "rotateY(0deg)");
+        payButton.html(`<i class="material-icons">lock</i> Pay ${total.toFixed(2)} EGP`);
+        $(".container").removeClass("purchase-failed");
       }, 1500);
       console.error(msg);
     }
