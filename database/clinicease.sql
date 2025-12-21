@@ -178,7 +178,21 @@ CREATE TABLE Services (
     Status NVARCHAR(10) NOT NULL CHECK (Status IN ('Active', 'Inactive')),
     Created_At DATETIME DEFAULT GETDATE()
 );
-
+CREATE TABLE patients_details (
+    patient_id INT PRIMARY KEY,
+    blood_type VARCHAR(5),
+    height_cm DECIMAL(5,2),
+    weight_kg DECIMAL(5,2),
+	medical_record text,
+    current_medications TEXT,
+    medical_notes TEXT,
+    emergency_contact_name VARCHAR(100),
+    emergency_contact_phone VARCHAR(20),
+	    CONSTRAINT FK_Patients_Details_Patients
+        FOREIGN KEY (patient_id)
+        REFERENCES Patients(patient_id)
+        ON DELETE CASCADE
+);
 
 INSERT INTO Services (Service_Name, Department, Price, Status)
 VALUES

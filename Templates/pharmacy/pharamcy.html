@@ -44,181 +44,86 @@
 
         {% include 'base/sidebar.html' %}
 
-        <main class="main">
-            <div class="topbar">
-                <div class="search-wrapper">
-                    <span class="search-icon">🔍</span>
-                    <input id="searchInput" class="search-input" type="text"
-                           placeholder="Search medicines by name, ID or supplier..." />
-                </div>
+<main class="main">
+    <div class="topbar">
+        <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input id="searchInput" class="search-input" type="text"
+                   placeholder="Search medicines by name, ID or supplier..." />
+        </div>
 
-                <div class="topbar-actions">
-                    <button class="chip-ai" type="button" id="aiHelperBtn">
-                        <span class="icon">⚡</span>
-                        <span>AI Assistance</span>
-                    </button>
-                    <button class="btn-round" type="button" title="Notifications">🔔</button>
-                    <!-- <div class="avatar-container">
-                        <div class="avatar">PH</div>
-                            {% if missing_profile_fields %}
-                                <a href="{{ url_for('patients.complete_profile') }}" class="profile-alert-dot">●</a>
-                            {% endif %}
-                    </div> -->
+        <div class="topbar-actions">
+            <button class="chip-ai" type="button" id="aiHelperBtn">
+                <span class="icon">⚡</span>
+                <span>AI Assistance</span>
+            </button>
+            <button class="btn-round" type="button">🔔</button>
 
-                    {% if missing_profile_fields %}
-                    <a href="{{ url_for('patients.complete_profile') }}" class="avatar-container">
-                        <div class="avatar">PH</div>
-                        <span class="profile-alert-dot">●</span>
-                    </a>
-                    {% else %}
-                    <div class="avatar-container">
-                        <div class="avatar">PH</div>
-                    </div>
-                    {% endif %}
-                    <!-- <div class="avatar">PH</div> -->
-                </div>
+            <div class="avatar-container">
+                <div class="avatar">PH</div>
             </div>
-
-            <div class="page-header">
-                <div class="page-header-left">
-                    <h1>Medicine Grid</h1>
-                    <span id="medicineCountSubtitle">All active medicines in stock</span>
-                </div>
-                <div class="page-header-right">
-                    <div class="filter-group">
-                        <label class="filter-label" for="supplierFilter">Supplier</label>
-                        <select id="supplierFilter" class="select-input">
-                            <option value="">All Suppliers</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label" for="expiryFilter">Expiry</label>
-                        <select id="expiryFilter" class="select-input">
-                            <option value="">Any</option>
-                            <option value="near">Near expiry (≤ 30 days)</option>
-                            <option value="expired">Expired</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label" for="sortSelect">Sort</label>
-                        <select id="sortSelect" class="select-input">
-                            <option value="name-asc">Name (A–Z)</option>
-                            <option value="name-desc">Name (Z–A)</option>
-                            <option value="price-asc">Price (Low–High)</option>
-                            <option value="price-desc">Price (High–Low)</option>
-                            <option value="quantity-asc">Qty (Low–High)</option>
-                            <option value="quantity-desc">Qty (High–Low)</option>
-                            <option value="expiry-asc">Expiry (Near–Far)</option>
-                            <option value="expiry-desc">Expiry (Far–Near)</option>
-                        </select>
-                    </div>
-
-                    <button class="btn-primary" type="button" id="newMedicineBtn">
-                        <span class="icon">＋</span>
-                        <span>New Medicine</span>
-                    </button>
-                </div>
-            </div>
-
-            <section class="content-card">
-                <div class="content-toolbar">
-                    <div class="content-toolbar-left">
-                        <div class="pill-count" id="medicineCountPill">0 medicines</div>
-                        <span id="filterSummary">Showing all medicines</span>
-                    </div>
-
-                    <div class="content-toolbar-right">
-                        <div class="chip-legend">
-                            <span><span class="dot dot-danger"></span> Critical stock</span>
-                            <span><span class="dot dot-warning"></span> Low stock</span>
-                            <span><span class="dot dot-success"></span> Healthy</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="medicine-grid" id="medicineGrid" 
-                     data-api-url="/pharmacy/api/medicines"
-                     data-api-buy-url="/pharmacy/api/medicines/__ID__/buy"
-                     data-api-restock-url="/pharmacy/api/medicines/__ID__/restock"
-                     data-api-delete-url="/pharmacy/api/medicines/__ID__">
-                    {% if medicines %}
-                        {% for medicine in medicines %}
-                        <div class="medicine-card" data-name="{{ medicine.MedicineName }}" data-id="{{ medicine.Medicine_id }}" data-supplier="{{ medicine.supplier }}" data-expiry="{{ medicine.ExpiryDate }}" data-quantity="{{ medicine.Quantity }}" data-price="{{ medicine.Price }}">
-                            <div class="medicine-card-header">
-                                <div class="medicine-name">{{ medicine.MedicineName }}</div>
-                                <div class="medicine-id">ID: {{ medicine.Medicine_id }}</div>
-                            </div>
-                            <div class="medicine-details">
-                                <div>Supplier: {{ medicine.supplier }}</div>
-                                <div>Price: ${{ "%.2f"|format(medicine.price) }}</div>
-                                <div>Quantity: {{ medicine.Quantity }}</div>
-                                <div>Expiry: {% if medicine.ExpiryDate %}{% if medicine.ExpiryDate is string %}{{ medicine.ExpiryDate }}{% else %}{{ medicine.ExpiryDate.strftime('%Y-%m-%d') }}{% endif %}{% else %}N/A{% endif %}</div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div style="text-align: center; padding: 2rem; color: #666;">
-                            <p>No medicines found in the database.</p>
-                        </div>
-                    {% endif %}
-
-
-            </section>
-        </main>
-    </div>
-
-    <div id="toast" class="toast hidden">
-        <div id="toastMessage"></div>
-    </div>
-
-    <div id="newMedicineModal" class="modal-overlay hidden">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2>Add New Medicine</h2>
-                <button class="modal-close" id="closeModalBtn" type="button">&times;</button>
-            </div>
-            <form id="newMedicineForm" class="modal-form">
-                <div class="form-group">
-                    <label for="medicineName">Medicine Name <span class="required">*</span></label>
-                    <input type="text" id="medicineName" name="MedicineName" required 
-                           placeholder="Enter medicine name" />
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="quantity">Quantity <span class="required">*</span></label>
-                        <input type="number" id="quantity" name="Quantity" required min="0" 
-                               placeholder="0" />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="price">Price ($) <span class="required">*</span></label>
-                        <input type="number" id="price" name="price" required min="0" step="0.01" 
-                               placeholder="0.00" />
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="supplier">Supplier <span class="required">*</span></label>
-                    <input type="text" id="supplier" name="supplier" required 
-                           placeholder="Enter supplier name" />
-                </div>
-                
-                <div class="form-group">
-                    <label for="expiryDate">Expiry Date <span class="required">*</span></label>
-                    <input type="date" id="expiryDate" name="ExpiryDate" required />
-                </div>
-                
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn-submit">Add Medicine</button>
-                </div>
-            </form>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='scripts/pharmacy.js') }}"></script>
-</body>
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1>Medicine Grid</h1>
+            <span id="medicineCountSubtitle">All active medicines in stock</span>
+        </div>
+
+        <div class="page-header-right">
+            <div class="filter-group">
+                <label for="supplierFilter">Supplier</label>
+                <select id="supplierFilter" class="select-input">
+                    <option value="">All Suppliers</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="expiryFilter">Expiry</label>
+                <select id="expiryFilter" class="select-input">
+                    <option value="">Any</option>
+                    <option value="near">Near expiry</option>
+                    <option value="expired">Expired</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="sortSelect">Sort</label>
+                <select id="sortSelect" class="select-input">
+                    <option value="name-asc">Name (A–Z)</option>
+                    <option value="name-desc">Name (Z–A)</option>
+                    <option value="price-asc">Price (Low–High)</option>
+                    <option value="price-desc">Price (High–Low)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <section class="content-card">
+        <div class="content-toolbar">
+            <div class="content-toolbar-left">
+                <div class="pill-count" id="medicineCountPill">0 medicines</div>
+                <span id="filterSummary">Showing all medicines</span>
+            </div>
+        </div>
+
+        <!-- ✅ CHECKOUT BUTTON -->
+
+
+        <div class="medicine-grid" id="medicineGrid"
+             data-api-url="/pharmacy/api/medicines"
+             data-api-buy-url="/pharmacy/api/medicines/__ID__/buy"
+             data-api-restock-url="/pharmacy/api/medicines/__ID__/restock"
+             data-api-delete-url="/pharmacy/api/medicines/__ID__">
+        </div>
+    </section>
+</main>
+
+<div id="toast" class="toast hidden">
+    <div id="toastMessage"></div>
+</div>
+
+<script src="{{ url_for('static', filename='scripts/pharmacy.js') }}"></script>
+
 </html>
