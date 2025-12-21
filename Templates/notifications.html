@@ -3,181 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predictive Strategy - Notifications</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <title>Notifications – ClinicEase</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
+<div class="container">
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <div class="sidebar">
         <div class="logo">
-            <h1>Predictive</h1>
-            <p class="subtitle">Strategy Module</p>
+            <h2><i class="fas fa-clinic-medical"></i> ClinicEase</h2>
         </div>
-        
-        <nav class="nav-menu">
-            <div class="nav-section">
-                <h3>Main Work</h3>
-                <ul class="nav-links">
-                    <li>
-                        <label class="nav-item">
-                            <input type="checkbox" disabled>
-                            <span class="checkmark"></span>
-                            <span class="nav-text">Disabled</span>
-                        </label>
-                    </li>
-                    <li>
-                        <label class="nav-item">
-                            <input type="checkbox" checked>
-                            <span class="checkmark"></span>
-                            <span class="nav-text">Missions</span>
-                        </label>
-                    </li>
-                </ul>
-            </div>
-            
-            <div class="nav-section">
-                <div class="info-card">
-                    <h3>Notification Grid</h3>
-                    <div class="info-detail">
-                        <span class="info-label">Unread messages:</span>
-                        <span class="info-value" id="unreadCount">12</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="nav-section">
-                <div class="info-card">
-                    <h3>Strategies</h3>
-                    <div class="info-detail">
-                        <span class="info-text">Pension all machines</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Additional Notification Filters -->
-            <div class="nav-section">
-                <h3>Filter By</h3>
-                <ul class="nav-links filter-links">
-                    <li>
-                        <label class="nav-item">
-                            <input type="checkbox" checked>
-                            <span class="checkmark"></span>
-                            <span class="nav-text">All Notifications</span>
-                        </label>
-                    </li>
-                    <li>
-                        <label class="nav-item">
-                            <input type="checkbox">
-                            <span class="checkmark"></span>
-                            <span class="nav-text">System Alerts</span>
-                        </label>
-                    </li>
-                    <li>
-                        <label class="nav-item">
-                            <input type="checkbox">
-                            <span class="checkmark"></span>
-                            <span class="nav-text">User Messages</span>
-                        </label>
-                    </li>
-                    <li>
-                        <label class="nav-item">
-                            <input type="checkbox">
-                            <span class="checkmark"></span>
-                            <span class="nav-text">Updates</span>
-                        </label>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-        
-        <div class="sidebar-footer">
-            <div class="activity-windows">
-                <p>Activity Windows</p>
-                <p class="small-text">Go to Settings to activate Windows.</p>
-            </div>
-        </div>
-    </aside>
-    
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Header -->
-        <header class="main-header">
-            <div class="header-left">
-                <h2>System Notifications</h2>
-                <div class="header-stats">
-                    <div class="stat">
-                        <span class="stat-label">Total:</span>
-                        <span class="stat-value" id="totalNotifications">24</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">Unread:</span>
-                        <span class="stat-value" id="headerUnread">12</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">Today:</span>
-                        <span class="stat-value">3</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="header-right">
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search notifications..." id="searchInput">
-                </div>
-                <button class="btn-primary" id="markAllReadBtn">
-                    <i class="fas fa-check-double"></i>
-                    Mark All Read
-                </button>
-                <div class="user-info">
-                    <div class="user-avatar">N</div>
-                    <span class="user-name">Notification Admin</span>
-                </div>
-            </div>
-        </header>
-        
-        <!-- Notification Grid -->
-        <div class="notification-grid" id="notificationGrid">
-            <!-- Notification cards will be dynamically loaded here -->
-        </div>
-        
-        <!-- Footer -->
-        <footer class="main-footer">
-            <div class="footer-left">
-                <p class="copyright">&copy; 2025 Predictive Strategy Module. All rights reserved.</p>
-                <p class="version">Version 2.5.1 | Last updated: 12/7/2023</p>
-            </div>
-            <div class="footer-right">
-                <button class="btn-secondary" id="exportBtn">
-                    <i class="fas fa-download"></i>
-                    Export Logs
-                </button>
-                <button class="btn-secondary" id="clearAllBtn">
-                    <i class="fas fa-trash-alt"></i>
-                    Clear All
-                </button>
-            </div>
-        </footer>
-    </main>
 
-    <!-- Notification Detail Modal -->
-    <div class="modal" id="notificationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Notification Details</h3>
-                <button class="close-modal" id="closeModal">&times;</button>
+        <div class="main-nav">
+            <div class="nav-section">
+                <h3>Main Menu</h3>
+                <ul class="nav-links">
+                    <li><a href="#" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-user-md"></i> Doctors</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-users"></i> Patients</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-prescription"></i> Prescriptions</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-notes-medical"></i> Lab Tests</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-comment-dots"></i> Chatbot</a></li>
+                    <li><a href="#" class="nav-item active"><i class="fas fa-bell"></i> Notifications <span class="badge">{{ unread_count }}</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-star"></i> Feedback</a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
             </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Notification details will appear here -->
+        </div>
+
+        <div class="dark-mode-toggle">
+            <span>Dark Mode</span>
+            <div class="toggle-switch">
+                <input type="checkbox" id="darkModeToggle">
+                <label for="darkModeToggle"></label>
             </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" id="markAsReadBtn">Mark as Read</button>
-                <button class="btn-primary" id="closeModalBtn">Close</button>
+        </div>
+
+        <div class="user-profile">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
             </div>
+            <div class="user-info">
+                <strong>{{ user_name }}</strong>
+                <span>{{ user_role }}</span>
+            </div>
+            <a href="/auth/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i></a>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Notifications</h1>
+            {% if total_notifications > 0 %}
+            <div class="header-actions">
+                <button class="btn mark-all-read">
+                    <i class="fas fa-check-double"></i> Mark All as Read
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if notifications %}
+        <div class="notifications-container">
+            {% for n in notifications %}
+            <div class="notification-card {{ 'unread' if n.status == 'Unread' else '' }}" data-id="{{ n.notification_id }}">
+                <div class="notification-icon">
+                    {% if n.type == 'appointment' %}<i class="fas fa-calendar-check"></i>{% endif %}
+                    {% if n.type == 'payment' %}<i class="fas fa-credit-card"></i>{% endif %}
+                    {% if n.type == 'prescription' %}<i class="fas fa-prescription"></i>{% endif %}
+                    {% if n.type == 'reminder' %}<i class="fas fa-bell"></i>{% endif %}
+                    {% if n.type == 'feedback' %}<i class="fas fa-star"></i>{% endif %}
+                    {% if n.type == 'system' %}<i class="fas fa-cog"></i>{% endif %}
+                </div>
+                <div class="notification-content">
+                    <div class="notification-message">{{ n.message }}</div>
+                    <div class="notification-time">{{ n.formatted_date }} — {{ n.status }}</div>
+                </div>
+                {% if n.status == 'Unread' %}
+                <button class="mark-read-btn">
+                    <i class="fas fa-envelope"></i>
+                </button>
+                {% else %}
+                <div class="read-indicator">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-bell-slash"></i>
+            <h3>No Notifications</h3>
+            <p>You’re all caught up! We’ll notify you about appointments, payments, and more.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
 </body>
 </html>
