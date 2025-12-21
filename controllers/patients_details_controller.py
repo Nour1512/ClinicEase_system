@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 from repositories.patients_details_repository import patient_details_repository
-from models.patient_details import patient_detailes
+from models.patient_details import patient_details
 
 patients_details_bp = Blueprint("patients_details", __name__)
 repo = patient_details_repository()
@@ -13,7 +13,7 @@ def patient_details_page(patient_id):
         return redirect(url_for("auth.login"))
 
     role = session.get("role")
-    patient_details = repo.get_pateint_detail_byt_id(patient_id)
+    patient_details = repo.get_patient_detail_by_id(patient_id)
 
     if not patient_details:
         flash("Patient details not found", "error")
@@ -30,7 +30,7 @@ def patient_details_page(patient_id):
 
 @patients_details_bp.route("/patient_details/<int:patient_id>/update", methods=["POST"])
 def update_patient_details(patient_id):
-    patient = patient_detailes(
+    patient = patient_details(
         patient_id=patient_id,
         blood_type=request.form["blood_type"],
         height_cm=request.form["height_cm"],
