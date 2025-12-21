@@ -1,9 +1,9 @@
 from core.db_singleton import DatabaseConnection
-from models.patient_details import patient_detailes
+from models.patient_details import patient_details
 
 class patient_details_repository:
 
-    def get_pateint_detail_byt_id(self, patient_id):
+    def get_patient_detail_by_id(self, patient_id):
         db = DatabaseConnection().get_connection()
         try:
             cursor = db.cursor()
@@ -15,13 +15,13 @@ class patient_details_repository:
             if row:
                 columns = [col[0] for col in cursor.description]
                 row_dict = dict(zip(columns, row))
-                return patient_detailes.from_dict(row_dict)
+                return patient_details.from_dict(row_dict)
             return None
         finally:
             cursor.close()
             db.close()
 
-    def update_patient_details(self, patient: patient_detailes):
+    def update_patient_details(self, patient: patient_details):
         db = DatabaseConnection().get_connection()
         try:
             cursor = db.cursor()
@@ -47,7 +47,7 @@ class patient_details_repository:
         finally:
             cursor.close()
             db.close()
-def add_patient_details(self, patient: patient_detailes):
+def add_patient_details(self, patient: patient_details):
     db = DatabaseConnection().get_connection()
     try:
         cursor = db.cursor()
