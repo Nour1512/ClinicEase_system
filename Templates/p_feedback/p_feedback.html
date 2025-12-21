@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Feedback Dashboard</title>
+    <link rel="stylesheet" href="/static/css/p_feedback.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">H</div>
+                <div>
+                    <div class="sidebar-title">HealthHub</div>
+                    <div class="sidebar-subtitle">Medical Dashboard</div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section-title">Main Menu</div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="icon"><i class="fas fa-home"></i></span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="icon"><i class="fas fa-calendar-check"></i></span>
+                        Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="icon"><i class="fas fa-user-injured"></i></span>
+                        Patients
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <span class="icon"><i class="fas fa-comment-medical"></i></span>
+                        Patient Feedback
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                        Invoices
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                        Analytics
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-section-title">Settings</div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="icon"><i class="fas fa-cog"></i></span>
+                        Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="icon"><i class="fas fa-question-circle"></i></span>
+                        Help & Support
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div>Logged in as <strong>Dr. Ahmed Hassan</strong></div>
+                <div>Last login: Today, 10:30 AM</div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search for patients, feedback, or reports...">
+                </div>
+                
+                <div class="topbar-actions">
+                    <div class="chip-ai" id="aiAnalysisBtn">
+                        <span class="icon">AI</span>
+                        <span>Feedback Analysis</span>
+                    </div>
+                    <button class="btn-round">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="btn-round">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                    <div class="avatar">AH</div>
+                </div>
+            </div>
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1>Patient Feedback Form</h1>
+                    <div class="breadcrumb">
+                        <a href="#">Dashboard</a>
+                        <span class="separator">/</span>
+                        <a href="#">Patient Care</a>
+                        <span class="separator">/</span>
+                        <span>Patient Feedback</span>
+                    </div>
+                </div>
+                
+                <div class="page-header-right">
+                    <button class="btn-secondary" id="exportBtn">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                    <button class="btn-primary" id="analyticsBtn">
+                        <i class="fas fa-chart-pie"></i>
+                        View Analytics
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Feedback Form Card -->
+            <div class="feedback-form-card">
+                <div class="form-header">
+                    <h2>Please take a few moments to complete this form</h2>
+                    <p>Your feedback helps us improve our services and provide better care</p>
+                </div>
+                
+                <div class="form-content">
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h3>Personal Information</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <div class="gender-select">
+                                <div class="gender-toggle" id="genderToggle">
+                                    <span>Please Select</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="gender-dropdown" id="genderDropdown">
+                                    <div class="gender-option" data-value="male">Male</div>
+                                    <div class="gender-option" data-value="female">Female</div>
+                                    <div class="gender-option" data-value="other">Other</div>
+                                    <div class="gender-option" data-value="prefer-not-to-say">Prefer not to say</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Birth Date</label>
+                            <div class="birth-date-select">
+                                <div class="date-select">
+                                    <select id="monthSelect">
+                                        <option value="" selected disabled>Please select a month</option>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="date-select">
+                                    <select id="daySelect">
+                                        <option value="" selected disabled>Please select a day</option>
+                                        <!-- Days will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                
+                                <div class="date-select">
+                                    <select id="yearSelect">
+                                        <option value="" selected disabled>Please select a year</option>
+                                        <!-- Years will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Satisfaction Section -->
+                    <div class="form-section">
+                        <h3>Overall Satisfaction</h3>
+                        
+                        <table class="satisfaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Very satisfied</th>
+                                    <th>Satisfied</th>
+                                    <th>Neutral</th>
+                                    <th>Unsatisfied</th>
+                                    <th>Very unsatisfied</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="category-label">Doctor Knowledge</td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_knowledge" data-rating="5">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_knowledge" data-rating="4">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_knowledge" data-rating="3">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Neutral</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_knowledge" data-rating="2">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_knowledge" data-rating="1">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="category-label">Doctor Kindness</td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_kindness" data-rating="5">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_kindness" data-rating="4">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_kindness" data-rating="3">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Neutral</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_kindness" data-rating="2">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="doctor_kindness" data-rating="1">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="category-label">Nurse Patience</td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_patience" data-rating="5">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_patience" data-rating="4">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_patience" data-rating="3">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Neutral</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_patience" data-rating="2">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_patience" data-rating="1">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="category-label">Nurse Knowledge</td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_knowledge" data-rating="5">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_knowledge" data-rating="4">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_knowledge" data-rating="3">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Neutral</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_knowledge" data-rating="2">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="nurse_knowledge" data-rating="1">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="category-label">Waiting Time</td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="waiting_time" data-rating="5">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="waiting_time" data-rating="4">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="waiting_time" data-rating="3">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Neutral</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="waiting_time" data-rating="2">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="waiting_time" data-rating="1">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="category-label">Hygiene</td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="hygiene" data-rating="5">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="hygiene" data-rating="4">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Satisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="hygiene" data-rating="3">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Neutral</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="hygiene" data-rating="2">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rating-options">
+                                            <div class="rating-option" data-category="hygiene" data-rating="1">
+                                                <div class="rating-circle"></div>
+                                                <div class="rating-label">Very unsatisfied</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Improvement Suggestions Section -->
+                    <div class="form-section">
+                        <h3>How can we improve our service?</h3>
+                        <div class="form-group">
+                            <textarea 
+                                class="improvement-textarea" 
+                                id="improvementTextarea" 
+                                placeholder="Please share any suggestions or comments on how we can improve our services..."
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="form-actions">
+                    <button class="btn-submit" id="submitFeedbackBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Feedback
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+    
+    <script src="{{ url_for('static', filename='js/p_feedback.js') }}"></script>
+</body>
+</html>
