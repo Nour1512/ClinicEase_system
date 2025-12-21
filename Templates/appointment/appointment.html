@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Appointments</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/appointment.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    {% include 'base/sidebar.html' %}
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="topbar">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input id="searchInput" class="search-input" type="text" placeholder="Search patients or doctors..." />
+        </div>
+        <div class="topbar-actions">
+          <button class="chip-ai" type="button" id="aiHelperBtn">
+            <span class="icon">⚡</span>
+            <span>AI Assistance</span>
+          </button>
+          <button class="btn-round" type="button" title="Notifications">🔔</button>
+          <div class="avatar">PH</div>
+        </div>
+      </div>
+
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Appointments</h1>
+          <span>All scheduled appointments</span>
+        </div>
+        <div class="page-header-right">
+          <div class="filter-group">
+            <label class="filter-label" for="doctorFilter">Doctor</label>
+            <select id="doctorFilter" class="select-input">
+              <option value="">All Doctors</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label" for="statusFilter">Status</label>
+            <select id="statusFilter" class="select-input">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label" for="sortSelect">Sort</label>
+            <select id="sortSelect" class="select-input">
+              <option value="date-asc">Date (Oldest)</option>
+              <option value="date-desc" selected>Date (Newest)</option>
+              <option value="name-asc">Patient (A–Z)</option>
+              <option value="name-desc">Patient (Z–A)</option>
+            </select>
+          </div>
+          <!-- <button class="btn-primary" type="button" id="newAppointmentBtn">
+            <span class="icon">＋</span>
+            <span>Book Appointment</span>
+
+</button>-->
+        {% if session.role == "patient" %}
+        <a href="{{ url_for('appointment_bp.book_appointment') }}" class="btn-primary">
+        <span class="icon">＋</span>
+        <span>Book Appointment</span>
+        </a>
+        {% endif %}
+
+        </div>
+      </div>
+
+      <section class="content-card">
+        <div class="content-toolbar">
+          <div class="content-toolbar-left">
+            <div class="pill-count" id="appointmentCountPill">0 appointments</div>
+            <!-- <span id="filterSummary">Loading...</span> -->
+            <div class="chip-legend">
+              <span><span class="dot dot-warning"></span> Pending/Scheduled</span>
+              <span><span class="dot dot-success"></span> Completed</span>
+              <span><span class="dot dot-danger"></span> Cancelled</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🔥 CRITICAL FIX: Hardcoded placeholder for JS -->
+        <!-- <div class="medicine-grid" 
+             id="appointmentGrid"
+             data-api-url="{{ url_for('appointment_bp.get_appointments') }}">
+        </div> -->
+        <div class="medicine-grid" 
+            id="appointmentGrid"
+            data-api-url="{{ url_for('appointment_bp.get_role_based_appointments') }}"
+            data-user-role="{{ session.get('role', '') }}"
+            data-user-id="{{ session.get('user_id', '') }}">
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden">
+    <div id="toastMessage"></div>
+  </div>
+
+  <!-- Modal -->
+  <div id="newAppointmentModal" class="modal-overlay hidden">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2>Book New Appointment</h2>
+
+        <button id="closeModalBtn" class="modal-close">&times;</button>
+      </div>
+      <form id="newAppointmentForm" class="modal-form">
+        <div class="form-group">
+          <label>Patient ID <span class="required">*</span></label>
+          <input type="number" name="patient_id" required min="1" />
+        </div>
+        <div class="form-group">
+          <label>Doctor ID <span class="required">*</span></label>
+          <input type="number" name="doctor_id" required min="1" />
+        </div>
+        <div class="form-group">
+          <label>Appointment Date & Time <span class="required">*</span></label>
+          <input type="datetime-local" name="appointment_date" required />
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea name="notes" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="cancelBtn" class="btn-cancel">Cancel</button>
+          <button type="submit" class="btn-submit">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("aiHelperBtn").addEventListener("click", () => 
+      alert("AI Assistant coming soon!")
+    );
+  </script>
+  
+  <script src="{{ url_for('static', filename='scripts/appointment.js') }}"></script>
+</body>
+</html> 
