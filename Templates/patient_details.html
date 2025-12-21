@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Patient Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/pateints_details.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <!-- <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">Rx</div>
+                <div>
+                    <div class="sidebar-title">Preclinic</div>
+                    <div class="sidebar-subtitle">Pharmacy Module</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section-title">Main Menu</div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <span class="icon">🏠</span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <span class="icon">💊</span>
+                        Medicines
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div><strong>TruCare Clinic</strong></div>
+                <div>Inventory v1.0</div>
+            </div>
+        </aside> -->
+
+        {% include 'base/sidebar.html' %}
+<main class="main">
+    <div class="container">
+        <h2>Patient Details</h2>
+
+        <form method="POST"
+          action="{{ url_for('patients_details.update_patient_details', patient_id=patient.patient_id) }}"
+          id="patientForm">
+
+            <label>Blood Type</label>
+            <input type="text" name="blood_type" value="{{ patient.blood_type }}" required>
+
+            <label>Height (cm)</label>
+            <input type="number" name="height_cm" value="{{ patient.height_cm }}" required>
+
+            <label>Weight (kg)</label>
+            <input type="number" name="weight_kg" value="{{ patient.weight_kg }}" required>
+
+            <label>Medical Record</label>
+            <textarea name="medical_record">{{ patient.medical_record }}</textarea>
+
+            <label>Current Medications</label>
+            <textarea name="current_medications">{{ patient.current_medications }}</textarea>
+
+            <label>Medical Notes</label>
+            <textarea name="medical_notes">{{ patient.medical_notes }}</textarea>
+
+        <label>Emergency Contact Name</label>
+        <input type="text" name="emergency_contact_name"
+               value="{{ patient.emergency_contact_name }}">
+
+        <label>Emergency Contact Phone</label>
+        <input type="text" name="emergency_contact_phone"
+               value="{{ patient.emergency_contact_phone }}">
+
+        <button type="submit" id="submitBtn" onclick="console.log('Button clicked!'); console.log('Form:', document.getElementById('patientForm')); console.log('Action:', document.getElementById('patientForm').action);">Update Patient</button>
+    </form>
+    </main>
+
+
+<script src="{{ url_for('static', filename='scripts/patients_details.js') }}"></script>
+</body>
+</html>

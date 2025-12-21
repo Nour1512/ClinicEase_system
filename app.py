@@ -30,6 +30,7 @@ from controllers.auth_controller import auth_bp
 from controllers.settings_controler import settings_bp
 from controllers.payment_controllers import payment_bp  # This payment_bp should match the blueprint name
 # from repositories.patient_repository import init_db
+from controllers.patients_details_controller import patients_details_bp
 
 # Load environment variables
 load_dotenv()
@@ -101,6 +102,7 @@ from controllers.pharamcy_controler import pharmacy_bp
 app.register_blueprint(pharmacy_bp)
 app.register_blueprint(payment_bp, url_prefix='/')  # Add url_prefix if needed
 app.register_blueprint(service_bp)
+# app.register_blueprint(patie)
 from controllers.chatbot_controller import chatbot_bp
 app.register_blueprint(chatbot_bp)
 from controllers.invoice_controller import invoice_bp
@@ -109,7 +111,7 @@ app.register_blueprint(invoice_bp)
 # app.register_blueprint(service_bp)
 from controllers.patient_controller import patients_bp
 app.register_blueprint(patients_bp, url_prefix='/patients')
-
+app.register_blueprint(patients_details_bp)
 from controllers.admin_controller import admin_bp
 from controllers.doctor_controller import doctor_bp
 
