@@ -61,7 +61,7 @@ def create_payment():
             "success": True,
             "message": "Payment processed successfully!",
             "payment_id": payment_id,
-            # "redirect_url": url_for("patient.dashboard")
+            "redirect_url": url_for("payment.after_payment_page")
         })
 
     except Exception as e:
@@ -70,3 +70,11 @@ def create_payment():
             "success": False,
             "message": f"Payment failed: {str(e)}"
         }), 500
+
+@payment_bp.route("/payment-page")
+def payment_page():
+    return render_template("payments/credit_card.html")
+
+@payment_bp.route("/after-payment-page")
+def after_payment_page():
+    return render_template("user/confirmation.html")

@@ -51,8 +51,8 @@ class DatabaseConnection:
         if not hasattr(self, 'initialized'): 
             self.connection_string = (
                 "DRIVER={ODBC Driver 17 for SQL Server};"
-                "SERVER=localhost\\SQLEXPRESS;"
-                "DATABASE=Clinic_Ease;"
+                "SERVER=NOURALKHAMISSI\\SQLEXPRESS;"
+                "DATABASE=soha_swe;"
                 "Trusted_Connection=yes;"
             )
             self.initialized = True

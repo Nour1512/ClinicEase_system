@@ -164,5 +164,3 @@ class AppointmentRepository:
         finally:
             cursor.close()
             db.close()
-
-appointment_repository.py

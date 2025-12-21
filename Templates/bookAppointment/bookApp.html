@@ -18,7 +18,7 @@
 
     <h2 style="text-align:center; margin-bottom:20px;">Book Appointment</h2>
 
-    <form method="POST">
+    <form method="POST" action="{{ url_for('appointment.book_appointment') }}">
 
       <div class="formbold-mb-5">
         <label class="formbold-form-label">Full Name</label>

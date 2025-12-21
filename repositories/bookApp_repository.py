@@ -1,9 +1,6 @@
 from core.db_singleton import DatabaseConnection
-from models.bookApp import Appointment  # Adjust import based on your actual model location
 
-
-class AppointmentRepository:
-
+class AppointmentRepository_book:
     def add_appointment(self, appointment):
         db = DatabaseConnection().get_connection()
         try:
@@ -23,8 +20,17 @@ class AppointmentRepository:
                 appointment.state,
                 appointment.post_code
             ))
-
+            
+            if cursor.rowcount == 0:
+                raise Exception("Insert failed: No rows affected")
+                
             db.commit()
+            return True
+            
+        except Exception as e:
+            db.rollback()
+            print(f"Database insert error: {e}")
+            raise e
         finally:
             cursor.close()
             db.close()

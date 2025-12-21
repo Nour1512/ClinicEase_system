@@ -141,11 +141,11 @@
     </div>
   </div>
 
-  <script>
-    document.getElementById("aiHelperBtn").addEventListener("click", () => 
-      alert("AI Assistant coming soon!")
-    );
-  </script>
+    <script>
+        document.getElementById("aiHelperBtn").addEventListener("click", function() {
+            window.location.href = "/chatbot-page";
+        });
+    </script>
   
   <script src="{{ url_for('static', filename='scripts/appointment.js') }}"></script>
 </body>

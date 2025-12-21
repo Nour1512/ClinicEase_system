@@ -1,4 +1,4 @@
-class Appointment:
+class Appointment_Book:
     def __init__(self, name, phone, email, date, time, area, city, state, post_code):
         self.name = name
         self.phone = phone

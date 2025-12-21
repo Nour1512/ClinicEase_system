@@ -32,6 +32,12 @@
                     Doctors
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/appointments">
+                    <span class="icon">👥</span>
+                    All Appointments
+                </a>
+            </li>
 
         {% elif current_role == "doctor" %}
             <!-- Doctor sees "My Patients" as main page -->
@@ -46,6 +52,12 @@
                 <a class="nav-link" href="/pharmacy">
                     <span class="icon">💊</span>
                     Medicines
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/appointments">
+                    <span class="icon">👥</span>
+                    My Appointments
                 </a>
             </li>
 
@@ -67,6 +79,12 @@
                 <a class="nav-link" href="/invoice-page">
                     <span class="icon">📄</span>
                     Invoices
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/appointments">
+                    <span class="icon">👥</span>
+                    My Appointments
                 </a>
             </li>
         {% endif %}
