@@ -69,7 +69,7 @@ def patients_page():
     ]
 
     return render_template(
-        "admin/patients.html",
+        "user/admin/patients.html",
         patients=patients_dict,  # ← Pass dictionaries
         role=role
     )

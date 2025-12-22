@@ -42,7 +42,7 @@
         {% elif current_role == "doctor" %}
             <!-- Doctor sees "My Patients" as main page -->
             <li class="nav-item">
-                <a class="nav-link active" href="/doctor/patients">
+                <a class="nav-link active" href="/patients">
                     <span class="icon">👥</span>
                     My Patients
                 </a>
@@ -70,12 +70,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/payment-page">
-                    <span class="icon">💳</span>
-                    Payment
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="/invoice-page">
                     <span class="icon">📄</span>
                     Invoices
@@ -85,6 +79,12 @@
                 <a class="nav-link" href="/appointments">
                     <span class="icon">👥</span>
                     My Appointments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/doctors">
+                    <span class="icon">👥</span>
+                    Doctors
                 </a>
             </li>
         {% endif %}

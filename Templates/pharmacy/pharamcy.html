@@ -57,11 +57,26 @@
                 <span class="icon">⚡</span>
                 <span>AI Assistance</span>
             </button>
-            <button class="btn-round" type="button">🔔</button>
+            <!-- <button class="btn-round" type="button">🔔</button> -->
+            <a href="{{ url_for('notifications.notifications_page') }}" 
+                class="btn-round notification-bell" 
+                style="text-decoration: none; display: inline-block; border: none; background: transparent; cursor: pointer; padding: 8px; border-radius: 50%; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 1.2rem; color: #f59e0b;">🔔</span>
+            </a>
 
-            <div class="avatar-container">
+            {% if missing_profile_fields %}
+                <a href="{{ url_for('patients.complete_profile') }}" class="avatar-container">
+                    <div class="avatar">PH</div>
+                    <span class="profile-alert-dot">●</span>
+                </a>
+            {% else %}
+                <div class="avatar-container">
+                    <div class="avatar">PH</div>
+                </div>
+            {% endif %}
+            <!-- <div class="avatar-container">
                 <div class="avatar">PH</div>
-            </div>
+            </div> -->
         </div>
     </div>
 

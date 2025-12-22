@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, jsonify, session, redirect, request
 from repositories.doctor_repository import DoctorRepository
 
-doctor_bp = Blueprint("doctor", __name__, url_prefix="/doctor")
+doctor_bp = Blueprint("doctor", __name__)
 doctor_repo = DoctorRepository()
 
 @doctor_bp.route("/doctors")

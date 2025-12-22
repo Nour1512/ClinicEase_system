@@ -114,7 +114,7 @@ def dashboard():
         return redirect("/pharmacy")
     elif role == "doctor":
         # return render_template("user/doctor/doctors.html", name=session["name"])
-        return redirect("/doctor/patients")
+        return redirect("/patients")
     elif role == "admin":
         return redirect("/admin/patients")      # 7ateet patients page badal dashboard
     else:

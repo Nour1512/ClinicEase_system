@@ -26,7 +26,10 @@
                 <span class="icon">⚡</span>
                 <span>AI Assistance</span>
             </button>
-            <button class="btn-round" type="button">🔔</button>
+            <!-- <button class="btn-round" type="button">🔔</button> -->
+            <a href="{{ url_for('notifications.notifications_page') }}" class="btn-round" style="text-decoration: none; display: inline-block; border: none; background: transparent; cursor: pointer;">
+    🔔
+            </a>
 
             <div class="avatar-container">
                 <div class="avatar">DR</div>
@@ -80,7 +83,7 @@
         </div>
 
         <div class="medicine-grid" id="doctorGrid"
-             data-api-url="/doctor/api/doctors">
+             data-api-url="{{ url_for('doctor.get_doctors') }}">
         </div>
     </section>
 </main>

@@ -108,13 +108,15 @@ app.register_blueprint(invoice_bp)
 # from controllers.service_controller import service_bp
 # app.register_blueprint(service_bp)
 from controllers.patient_controller import patients_bp
-app.register_blueprint(patients_bp, url_prefix='/patients')
+app.register_blueprint(patients_bp)
 
 from controllers.admin_controller import admin_bp
 from controllers.doctor_controller import doctor_bp
+from controllers.notifications_controller import notification_bp
+app.register_blueprint(notification_bp)
 
 app.register_blueprint(admin_bp, url_prefix='/admin')
-app.register_blueprint(doctor_bp, url_prefix='/doctor')
+app.register_blueprint(doctor_bp)
 
 from controllers.appointment_controller import appointment_bp
 

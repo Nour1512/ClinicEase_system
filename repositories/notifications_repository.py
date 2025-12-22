@@ -1,4 +1,4 @@
-from db_singleton import DatabaseConnection
+from core.db_singleton import DatabaseConnection
 
 class NotificationRepository:
     def __init__(self):

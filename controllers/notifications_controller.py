@@ -2,12 +2,12 @@ from flask import Blueprint, render_template, session, jsonify
 from repositories.notifications_repository import NotificationRepository
 from datetime import datetime
 
-notification_bp = Blueprint("notifications", __name__, url_prefix="/notifications")
+notification_bp = Blueprint("notifications", __name__)
 
 repo = NotificationRepository()
 
 
-@notification_bp.route("/")
+@notification_bp.route("/notifications")
 def notifications_page():
     if "user_id" not in session:
         return render_template("errors/403.html")

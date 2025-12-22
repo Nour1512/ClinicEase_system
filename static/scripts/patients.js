@@ -597,7 +597,7 @@ const filterSummary = document.getElementById("filterSummary");
 const newPatientBtn = document.getElementById("newPatientBtn");
 const newPatientModal = document.getElementById("newPatientModal");
 const newPatientForm = document.getElementById("newPatientForm");
-const API_LIST_URL = "/patients/api/patients";
+const API_LIST_URL = "/api/patients";
 
 let patients = [];
 
@@ -720,7 +720,7 @@ async function submitNewPatient(e) {
     };
 
     try {
-        const res = await fetch("/patients/api/patients", {
+        const res = await fetch("/api/patients", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(patientData)
