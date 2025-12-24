@@ -1,404 +1,263 @@
-// Service Management System
-let allServices = [];
+// API endpoints
+const API_BASE = '/service/api';
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    loadServices();
-    setupEventListeners();
-});
+// DOM Elements
+const gridEl = document.getElementById("serviceGrid");
+const searchInput = document.getElementById("searchInput");
+const departmentFilter = document.getElementById("departmentFilter");
+const statusFilter = document.getElementById("statusFilter");
+const sortSelect = document.getElementById("sortSelect");
+const serviceCountPill = document.getElementById("serviceCountPill");
+const serviceCountSubtitle = document.getElementById("serviceCountSubtitle");
+const filterSummary = document.getElementById("filterSummary");
+const addServiceBtn = document.getElementById("addServiceBtn");
+const serviceModal = document.getElementById("serviceModal");
+const serviceForm = document.getElementById("serviceForm");
+const modalTitle = document.getElementById("modalTitle");
+const toast = document.getElementById("toast");
+const toastMessage = document.getElementById("toastMessage");
+const aiHelperBtn = document.getElementById("aiHelperBtn");
 
-// ========== LOAD SERVICES ==========
-async function loadServices() {
-    try {
-        console.log('📡 Loading services from API...');
-        
-        const response = await fetch('/service/api/get');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        allServices = await response.json();
-        console.log(`✅ Loaded ${allServices.length} services`);
-        
-        renderServices(allServices);
-        updateServiceCount();
-        
-    } catch (error) {
-        console.error('❌ Error loading services:', error);
-        showToast('Failed to load services. Please refresh the page.', 'error');
+// Data
+let services = [];
+let isEditing = false;
+let currentServiceId = null;
+
+// ================== Model ==================
+class Service {
+    constructor(service_id, service_name, department, price, status) {
+        this.service_id = service_id;
+        this.service_name = service_name;
+        this.department = department;
+        this.price = parseFloat(price);
+        this.status = status;
+    }
+
+    static from_dict(d) {
+        return new Service(
+            d.service_id,
+            d.service_name,
+            d.department,
+            d.price,
+            d.status
+        );
+    }
+
+    isActive() {
+        return this.status === 'Active';
+    }
+
+    getStatusClass() {
+        return this.isActive() ? 'status-active' : 'status-inactive';
     }
 }
 
-// ========== RENDER SERVICES ==========
-function renderServices(services) {
-    const grid = document.getElementById('serviceGrid');
-    
-    if (!grid) {
-        console.error('❌ Service grid element not found!');
-        return;
+// ================== Load ==================
+async function loadServices() {
+    try {
+        const res = await fetch(`${API_BASE}/get`);
+        const data = await res.json();
+        services = data.map(Service.from_dict);
+        renderDepartmentsFilter();
+        applyFiltersAndRender();
+    } catch (err) {
+        console.error(err);
+        showToast("Failed to load services", "error");
     }
-    
-    if (services.length === 0) {
-        grid.innerHTML = `
+}
+
+// ================== Filters ==================
+function applyFiltersAndRender() {
+    let result = [...services];
+    const q = searchInput.value.trim().toLowerCase();
+
+    if (q) {
+        result = result.filter(s =>
+            s.service_name.toLowerCase().includes(q) ||
+            s.department.toLowerCase().includes(q)
+        );
+    }
+
+    if (departmentFilter.value) {
+        result = result.filter(s => s.department === departmentFilter.value);
+    }
+
+    if (statusFilter.value) {
+        result = result.filter(s => s.status === statusFilter.value);
+    }
+
+    result.sort((a, b) => {
+        switch (sortSelect.value) {
+            case "name-asc": return a.service_name.localeCompare(b.service_name);
+            case "name-desc": return b.service_name.localeCompare(a.service_name);
+            case "price-asc": return a.price - b.price;
+            case "price-desc": return b.price - a.price;
+            default: return 0;
+        }
+    });
+
+    renderGrid(result);
+}
+
+// ================== Render ==================
+function renderDepartmentsFilter() {
+    departmentFilter.innerHTML = '<option value="">All Departments</option>';
+    [...new Set(services.map(s => s.department))].sort().forEach(d => {
+        const o = document.createElement("option");
+        o.value = d;
+        o.textContent = d;
+        departmentFilter.appendChild(o);
+    });
+}
+
+function renderGrid(data) {
+    if (!data.length) {
+        gridEl.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">🩺</div>
                 <h3>No Services Found</h3>
-                <p>Add your first medical service to get started</p>
-                <button class="btn-primary" onclick="openNewServiceModal()">
-                    <span class="icon">＋</span>
-                    <span>Add Service</span>
-                </button>
-            </div>
-        `;
+                <p>Try adjusting your filters</p>
+            </div>`;
         return;
     }
-    
-    grid.innerHTML = services.map(service => `
-        <div class="service-card" 
-             data-id="${service.service_id}" 
-             data-name="${service.service_name}" 
-             data-department="${service.department}" 
-             data-price="${service.price}" 
-             data-status="${service.status}">
-            
+
+    gridEl.innerHTML = data.map(s => `
+        <div class="service-card">
             <div class="service-card-header">
-                <div class="service-avatar">
-                    ${service.service_name.substring(0, 2).toUpperCase()}
-                </div>
+                <div class="service-avatar">${s.service_name.slice(0,2).toUpperCase()}</div>
                 <div>
-                    <div class="service-title">${service.service_name}</div>
-                    <div class="service-subtitle">${service.department}</div>
+                    <div class="service-title">${s.service_name}</div>
+                    <div class="service-subtitle">${s.department}</div>
                 </div>
             </div>
-            
-            <div class="badge-id">ID: ${service.service_id}</div>
-            
+
+            <div class="badge-id">ID: ${s.service_id}</div>
+
             <div class="service-meta">
                 <div>
                     <div>Price</div>
-                    <strong>$${parseFloat(service.price).toFixed(2)}</strong>
+                    <strong>$${s.price.toFixed(2)}</strong>
                 </div>
                 <div>
                     <div>Status</div>
-                    <strong class="status-${service.status.toLowerCase()}">${service.status}</strong>
+                    <strong class="${s.getStatusClass()}">${s.status}</strong>
                 </div>
             </div>
 
             <div class="service-footer">
                 <div class="service-status">
-                    <span class="dot dot-${service.status === 'Active' ? 'success' : 'warning'}"></span>
-                    ${service.status}
+                    <span class="dot dot-${s.isActive() ? 'success' : 'danger'}"></span>
+                    ${s.status}
                 </div>
                 <div class="card-actions">
-                    <button class="btn-mini" onclick="editService(${service.service_id})">
-                        Edit
-                    </button>
-                    <button class="btn-mini danger" onclick="deleteService(${service.service_id})">
-                        Delete
-                    </button>
+                    <button class="btn-mini edit-btn" data-id="${s.service_id}">Edit</button>
+                    <button class="btn-mini danger delete-btn" data-id="${s.service_id}">Delete</button>
                 </div>
             </div>
         </div>
     `).join('');
+
+    serviceCountPill.textContent = `${data.length} services`;
+    serviceCountSubtitle.textContent = `Total in system: ${services.length}`;
+    filterSummary.textContent = "Filtered services";
 }
 
-// ========== FORM SUBMISSION ==========
-async function saveService(event) {
-    event.preventDefault();
-    
-    console.log('📝 Saving service...');
-    
-    // Get form data
-    const formData = {
-        service_id: document.getElementById('service_id').value,
-        service_name: document.getElementById('service_name').value.trim(),
-        department: document.getElementById('department').value,
-        price: parseFloat(document.getElementById('price').value),
-        status: document.getElementById('status').value
-    };
-    
-    // Validation
-    if (!formData.service_name || !formData.department || !formData.price || !formData.status) {
-        showToast('Please fill in all required fields', 'warning');
-        return;
-    }
-    
-    if (formData.price <= 0) {
-        showToast('Price must be greater than 0', 'warning');
-        return;
-    }
-    
-    try {
-        const isEdit = !!formData.service_id;
-        const url = isEdit ? '/service/api/update' : '/service/api/add';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        console.log(`📤 Sending ${method} request to ${url}`, formData);
-        
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Save failed');
-        }
-        
-        const data = await response.json();
-        console.log('✅ Service saved:', data);
-        
-        showToast(data.message || 'Service saved successfully', 'success');
-        
-        // Close modal and refresh data
-        closeServiceModal();
-        await loadServices();
-        
-        // Verify in database
-        await verifyDatabase();
-        
-    } catch (error) {
-        console.error('❌ Error saving service:', error);
-        showToast(`Error: ${error.message}`, 'error');
-    }
-}
+// ================== Modal ==================
+function openModal(service = null) {
+    isEditing = !!service;
+    currentServiceId = service ? service.service_id : null;
+    modalTitle.textContent = isEditing ? "Edit Service" : "Add New Service";
 
-// ========== VERIFY DATABASE ==========
-async function verifyDatabase() {
-    try {
-        console.log('🔍 Verifying database...');
-        const response = await fetch('/service/api/get');
-        const services = await response.json();
-        console.log(`📊 Database now has ${services.length} services`);
-    } catch (error) {
-        console.error('❌ Error verifying database:', error);
-    }
-}
-
-// ========== DELETE SERVICE ==========
-async function deleteService(serviceId) {
-    if (!confirm('Are you sure you want to delete this service?')) {
-        return;
-    }
-    
-    try {
-        console.log(`🗑️ Deleting service ${serviceId}...`);
-        
-        const response = await fetch(`/service/api/delete/${serviceId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            throw new Error('Delete failed');
-        }
-        
-        const data = await response.json();
-        console.log('✅ Service deleted:', data);
-        
-        showToast(data.message || 'Service deleted successfully', 'success');
-        await loadServices();
-        
-    } catch (error) {
-        console.error('❌ Error deleting service:', error);
-        showToast('Error deleting service', 'error');
-    }
-}
-
-// ========== MODAL FUNCTIONS ==========
-function openNewServiceModal() {
-    console.log('📋 Opening new service modal...');
-    
-    document.getElementById('modalTitle').textContent = 'Add New Service';
-    document.getElementById('service_id').value = '';
-    document.getElementById('service_name').value = '';
-    document.getElementById('department').value = '';
-    document.getElementById('price').value = '';
-    document.getElementById('status').value = '';
-    
-    document.getElementById('serviceModal').classList.remove('hidden');
-}
-
-function editService(serviceId) {
-    console.log(`✏️ Editing service ${serviceId}...`);
-    
-    const service = allServices.find(s => s.service_id === serviceId);
-    if (!service) {
-        showToast('Service not found', 'error');
-        return;
-    }
-    
-    document.getElementById('modalTitle').textContent = 'Edit Service';
-    document.getElementById('service_id').value = service.service_id;
-    document.getElementById('service_name').value = service.service_name;
-    document.getElementById('department').value = service.department;
-    document.getElementById('price').value = service.price;
-    document.getElementById('status').value = service.status;
-    
-    document.getElementById('serviceModal').classList.remove('hidden');
-}
-
-function closeServiceModal() {
-    console.log('🔒 Closing modal...');
-    document.getElementById('serviceModal').classList.add('hidden');
-    document.getElementById('serviceForm').reset();
-}
-
-// ========== FILTER & SORT ==========
-function filterServices() {
-    const department = document.getElementById('departmentFilter').value;
-    const status = document.getElementById('statusFilter').value;
-    
-    let filtered = allServices;
-    
-    if (department) {
-        filtered = filtered.filter(s => s.department === department);
-    }
-    
-    if (status) {
-        filtered = filtered.filter(s => s.status === status);
-    }
-    
-    renderServices(filtered);
-    updateFilterSummary(filtered.length);
-}
-
-function sortServices() {
-    const sortBy = document.getElementById('sortSelect').value;
-    let sorted = [...allServices];
-    
-    switch(sortBy) {
-        case 'name-asc':
-            sorted.sort((a, b) => a.service_name.localeCompare(b.service_name));
-            break;
-        case 'name-desc':
-            sorted.sort((a, b) => b.service_name.localeCompare(a.service_name));
-            break;
-        case 'price-asc':
-            sorted.sort((a, b) => a.price - b.price);
-            break;
-        case 'price-desc':
-            sorted.sort((a, b) => b.price - a.price);
-            break;
-        case 'recent':
-        default:
-            sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            break;
-    }
-    
-    renderServices(sorted);
-}
-
-function searchServices() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    
-    if (!searchTerm) {
-        renderServices(allServices);
-        return;
-    }
-    
-    const filtered = allServices.filter(service => 
-        service.service_name.toLowerCase().includes(searchTerm) ||
-        service.department.toLowerCase().includes(searchTerm)
-    );
-    
-    renderServices(filtered);
-    updateFilterSummary(filtered.length);
-}
-
-// ========== HELPER FUNCTIONS ==========
-function updateServiceCount() {
-    const countElement = document.getElementById('serviceCountPill');
-    if (countElement) {
-        countElement.textContent = `${allServices.length} services`;
-    }
-}
-
-function updateFilterSummary(count) {
-    const summaryElement = document.getElementById('filterSummary');
-    if (summaryElement) {
-        if (count === allServices.length) {
-            summaryElement.textContent = 'Showing all services';
-        } else {
-            summaryElement.textContent = `Showing ${count} of ${allServices.length} services`;
-        }
-    }
-}
-
-function showAIAssistance() {
-    showToast('AI Assistance is coming soon!', 'info');
-}
-
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
-    
-    if (!toast || !toastMessage) {
-        console.error('Toast elements not found!');
-        return;
-    }
-    
-    toastMessage.textContent = message;
-    toast.className = `toast visible toast-${type}`;
-    
-    setTimeout(() => {
-        toast.classList.remove('visible');
-        toast.classList.remove(`toast-${type}`);
-    }, 3000);
-}
-
-// ========== EVENT LISTENERS ==========
-function setupEventListeners() {
-    // Form submission
-    const serviceForm = document.getElementById('serviceForm');
-    if (serviceForm) {
-        serviceForm.addEventListener('submit', saveService);
-        console.log('✅ Form event listener attached');
+    if (service) {
+        serviceForm.service_id.value = service.service_id;
+        serviceForm.service_name.value = service.service_name;
+        serviceForm.department.value = service.department;
+        serviceForm.price.value = service.price;
+        serviceForm.status.value = service.status;
     } else {
-        console.error('❌ Service form not found!');
+        serviceForm.reset();
+        serviceForm.status.value = "Active";
     }
-    
-    // Modal close buttons
-    document.querySelectorAll('.modal-close, .btn-cancel').forEach(btn => {
-        btn.addEventListener('click', closeServiceModal);
-    });
-    
-    // Close modal on outside click
-    const modal = document.getElementById('serviceModal');
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeServiceModal();
-            }
-        });
-    }
-    
-    // Real-time search
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        let searchTimeout;
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(searchServices, 300);
-        });
-    }
-    
-    // Filter and sort changes
-    document.getElementById('departmentFilter')?.addEventListener('change', filterServices);
-    document.getElementById('statusFilter')?.addEventListener('change', filterServices);
-    document.getElementById('sortSelect')?.addEventListener('change', sortServices);
-    
-    console.log('✅ All event listeners attached');
+
+    serviceModal.classList.remove("hidden");
 }
 
-// ========== GLOBAL FUNCTIONS (for HTML onclick) ==========
-window.openNewServiceModal = openNewServiceModal;
-window.editService = editService;
-window.deleteService = deleteService;
-window.closeServiceModal = closeServiceModal;
-window.showAIAssistance = showAIAssistance;
-window.filterServices = filterServices;
-window.sortServices = sortServices;
-window.searchServices = searchServices;
+function closeModal() {
+    serviceModal.classList.add("hidden");
+    serviceForm.reset();
+    isEditing = false;
+    currentServiceId = null;
+}
+
+// ================== Events ==================
+function bindEvents() {
+    searchInput.addEventListener("input", applyFiltersAndRender);
+    departmentFilter.addEventListener("change", applyFiltersAndRender);
+    statusFilter.addEventListener("change", applyFiltersAndRender);
+    sortSelect.addEventListener("change", applyFiltersAndRender);
+
+    addServiceBtn.addEventListener("click", () => openModal());
+
+    gridEl.addEventListener("click", e => {
+        const id = e.target.dataset.id;
+        if (!id) return;
+        const service = services.find(s => s.service_id == id);
+        if (e.target.classList.contains("edit-btn")) openModal(service);
+        if (e.target.classList.contains("delete-btn")) deleteService(id);
+    });
+
+    serviceForm.addEventListener("submit", handleFormSubmit);
+
+    // ✅ FIX: Cancel button
+    document.querySelector(".btn-cancel").addEventListener("click", closeModal);
+    document.querySelector(".modal-close").addEventListener("click", closeModal);
+
+    serviceModal.addEventListener("click", e => {
+        if (e.target === serviceModal) closeModal();
+    });
+}
+
+// ================== CRUD ==================
+async function handleFormSubmit(e) {
+    e.preventDefault();
+    const data = {
+        service_id: serviceForm.service_id.value,
+        service_name: serviceForm.service_name.value,
+        department: serviceForm.department.value,
+        price: serviceForm.price.value,
+        status: serviceForm.status.value
+    };
+
+    const url = isEditing ? `${API_BASE}/update` : `${API_BASE}/add`;
+    const method = isEditing ? "PUT" : "POST";
+
+    await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    showToast("Saved successfully", "success");
+    closeModal();
+    loadServices();
+}
+
+async function deleteService(id) {
+    if (!confirm("Delete this service?")) return;
+    await fetch(`${API_BASE}/delete/${id}`, { method: "DELETE" });
+    showToast("Deleted", "success");
+    loadServices();
+}
+
+// ================== Toast ==================
+function showToast(msg, type) {
+    toastMessage.textContent = msg;
+    toast.className = `toast visible toast-${type}`;
+    setTimeout(() => toast.classList.remove("visible"), 3000);
+}
+
+// ================== Init ==================
+document.addEventListener("DOMContentLoaded", () => {
+    loadServices();
+    bindEvents();
+});

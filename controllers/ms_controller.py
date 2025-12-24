@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request
-from repository.ms_repository import MedicineStockRepository
+from repositories.ms_repository import MedicineStockRepository
 
 ms_blueprint = Blueprint(
     'medicine_stock',
@@ -9,23 +9,23 @@ ms_blueprint = Blueprint(
 
 repo = MedicineStockRepository()
 
-# صفحة العرض
+
 @ms_blueprint.route('/')
 def page():
     return render_template('medcine_stock/ms.html')
 
-# جلب كل الأدوية
+
 @ms_blueprint.route('/api/medicines', methods=['GET'])
 def get_all():
     return jsonify(repo.get_all())
 
-# البحث
+
 @ms_blueprint.route('/api/medicines/search', methods=['GET'])
 def search():
     q = request.args.get('q', '')
     return jsonify(repo.search(q))
 
-# إضافة دواء جديد
+
 @ms_blueprint.route('/api/medicines', methods=['POST'])
 def add_medicine():
     data = request.get_json()
@@ -35,7 +35,7 @@ def add_medicine():
     medicine = repo.create(data)
     return jsonify(medicine.to_dict()), 201
 
-# تعديل دواء موجود
+
 @ms_blueprint.route('/api/medicines/<int:medicine_id>', methods=['PUT'])
 def update_medicine(medicine_id):
     data = request.get_json()
@@ -48,7 +48,7 @@ def update_medicine(medicine_id):
 
     return jsonify(updated_medicine.to_dict())
 
-# حذف دواء
+
 @ms_blueprint.route('/api/medicines/<int:medicine_id>', methods=['DELETE'])
 def delete_medicine(medicine_id):
     success = repo.delete(medicine_id)
@@ -56,7 +56,7 @@ def delete_medicine(medicine_id):
         return jsonify({'message': 'Medicine deleted successfully'})
     return jsonify({'error': 'Medicine not found'}), 404
 
-# اختبار الاتصال
+
 @ms_blueprint.route('/ping')
 def ping():
     return {"ping": "backend is alive"}

@@ -1,416 +1,681 @@
-class MedicineStockManager {
-    constructor() {
-        this.medicines = [];
-        this.currentMedicine = null;
-        this.init();
-        this.debounceTimer = null; // For search debounce
+// ================= Configuration =================
+const API_BASE = '/medicine-stock/api/medicines';
+const LOW_STOCK_THRESHOLD = 10;
+
+// ================= State =================
+let medicines = [];
+let currentMedicineId = null;
+let isEditing = false;
+
+// ================= DOM Elements =================
+const elements = {
+    // Search
+    searchInput: document.getElementById('searchInput'),
+    
+    // Main buttons
+    addMedicineBtn: document.getElementById('addMedicineBtn'),
+    refreshBtn: document.getElementById('refreshBtn'),
+    printBtn: document.getElementById('printBtn'),
+    exportBtn: document.getElementById('exportBtn'),
+    
+    // Modal elements
+    medicineModal: document.getElementById('medicineModal'),
+    medicineForm: document.getElementById('medicineForm'),
+    modalTitle: document.getElementById('modalTitle'),
+    closeModal: document.getElementById('closeModal'),
+    cancelMedicineBtn: document.getElementById('cancelMedicineBtn'),
+    saveMedicineBtn: document.getElementById('saveMedicineBtn'),
+    
+    // Form fields
+    medicineName: document.getElementById('medicineName'),
+    medicineDescription: document.getElementById('medicineDescription'),
+    medicineCategory: document.getElementById('medicineCategory'),
+    medicineManufacturer: document.getElementById('medicineManufacturer'),
+    medicinePrice: document.getElementById('medicinePrice'),
+    medicineQuantity: document.getElementById('medicineQuantity'),
+    medicineExpiration: document.getElementById('medicineExpiration'),
+    medicineBatch: document.getElementById('medicineBatch'),
+    
+    // Stats elements
+    totalMedicines: document.getElementById('totalMedicines'),
+    totalValue: document.getElementById('totalValue'),
+    totalItems: document.getElementById('totalItems'),
+    lowStock: document.getElementById('lowStock'),
+    outOfStock: document.getElementById('outOfStock'),
+    netValue: document.getElementById('netValue'),
+    stockTags: document.getElementById('stockTags'),
+    
+    // Action buttons
+    generateReportBtn: document.getElementById('generateReportBtn'),
+    checkExpiryBtn: document.getElementById('checkExpiryBtn'),
+    notifySuppliersBtn: document.getElementById('notifySuppliersBtn'),
+    emailReportBtn: document.getElementById('emailReportBtn'),
+    syncInventoryBtn: document.getElementById('syncInventoryBtn'),
+    
+    // Other
+    lastUpdated: document.getElementById('lastUpdated'),
+    medicineTableBody: document.getElementById('medicineTableBody'),
+    toast: document.getElementById('toast')
+};
+
+// ================= Initialize =================
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+});
+
+async function init() {
+    setupEventListeners();
+    await loadMedicines();
+    updateLastUpdated();
+    setInterval(updateLastUpdated, 60000);
+}
+
+// ================= Event Listeners =================
+function setupEventListeners() {
+    // Search functionality
+    if (elements.searchInput) {
+        elements.searchInput.addEventListener('input', debounce(searchMedicines, 300));
     }
-
-    init() {
-        this.loadMedicines();
-        this.setupEventListeners();
-        this.setupFormValidation();
+    
+    // Main buttons
+    if (elements.addMedicineBtn) {
+        elements.addMedicineBtn.addEventListener('click', () => openMedicineForm());
     }
-
-    async loadMedicines() {
-        try {
-            const response = await fetch('/medicine-stock/api/medicines');
-            if (!response.ok) throw new Error('Failed to load medicines');
-            this.medicines = await response.json();
-            this.renderMedicines();
-            this.updateSummary();
-        } catch (error) {
-            this.showToast('Error loading medicines', 'error');
-        }
-    }
-
-    renderMedicines() {
-        const tbody = document.getElementById('medicineTableBody');
-        tbody.innerHTML = '';
-
-        this.medicines.forEach(medicine => {
-            const row = document.createElement('tr');
-            const stockStatus = this.getStockStatus(medicine.quantity);
-            const statusClass = this.getStatusClass(stockStatus);
-
-            row.innerHTML = `
-                <td>
-                    <div class="medicine-name">${medicine.name}</div>
-                    <div class="medicine-description">${medicine.description || ''}</div>
-                </td>
-                <td>${medicine.category || ''}</td>
-                <td>${medicine.manufacturer || ''}</td>
-                <td>$${medicine.price.toFixed(2)}</td>
-                <td>
-                    <span class="status-badge ${statusClass}">
-                        <span class="dot"></span>
-                        ${stockStatus}
-                    </span>
-                </td>
-                <td class="text-right">${medicine.quantity}</td>
-                <td>${medicine.expiration_date || 'N/A'}</td>
-                <td class="text-right">
-                    <button class="btn-round" onclick="stockManager.editMedicine(${medicine.id})">
-                        <span class="icon">✏️</span>
-                    </button>
-                    <button class="btn-round" onclick="stockManager.deleteMedicine(${medicine.id})">
-                        <span class="icon">🗑️</span>
-                    </button>
-                </td>
-            `;
-
-            tbody.appendChild(row);
+    
+    if (elements.refreshBtn) {
+        elements.refreshBtn.addEventListener('click', () => {
+            loadMedicines();
+            showToast('Data refreshed successfully', 'success');
         });
     }
-
-    getStockStatus(quantity) {
-        if (quantity === 0) return 'Out of Stock';
-        if (quantity <= 10) return 'Low Stock';
-        if (quantity <= 50) return 'Medium Stock';
-        return 'High Stock';
+    
+    // Modal buttons
+    if (elements.closeModal) {
+        elements.closeModal.addEventListener('click', () => closeMedicineForm());
     }
-
-    getStatusClass(status) {
-        switch (status) {
-            case 'High Stock': return 'in-stock';
-            case 'Medium Stock': return 'in-stock';
-            case 'Low Stock': return 'low-stock';
-            case 'Out of Stock': return 'out-of-stock';
-            default: return '';
-        }
+    
+    if (elements.cancelMedicineBtn) {
+        elements.cancelMedicineBtn.addEventListener('click', () => closeMedicineForm());
     }
-
-    updateSummary() {
-        const totalValue = this.medicines.reduce((sum, med) => sum + (med.price * med.quantity), 0);
-        const totalItems = this.medicines.length;
-        const lowStock = this.medicines.filter(med => med.quantity <= 10 && med.quantity > 0).length;
-        const outOfStock = this.medicines.filter(med => med.quantity === 0).length;
-
-        document.getElementById('totalValue').textContent = `$${totalValue.toFixed(2)}`;
-        document.getElementById('totalItems').textContent = totalItems;
-        document.getElementById('lowStock').textContent = lowStock;
-        document.getElementById('outOfStock').textContent = outOfStock;
-        document.getElementById('totalMedicines').textContent = totalItems;
-
-        this.updateStockTags(lowStock, outOfStock);
+    
+    // Form submission
+    if (elements.medicineForm) {
+        elements.medicineForm.addEventListener('submit', (e) => handleFormSubmit(e));
     }
-
-    updateStockTags(lowStock, outOfStock) {
-        const tagsContainer = document.querySelector('.stock-tags');
-        tagsContainer.innerHTML = '';
-
-        if (outOfStock > 0) {
-            tagsContainer.innerHTML += `
-                <span class="stock-tag out-of-stock">
-                    ${outOfStock} Out of Stock
-                </span>
-            `;
-        }
-
-        if (lowStock > 0) {
-            tagsContainer.innerHTML += `
-                <span class="stock-tag low">
-                    ${lowStock} Low Stock
-                </span>
-            `;
-        }
-
-        const total = this.medicines.length;
-        const highStock = total - lowStock - outOfStock;
-        if (highStock > 0) {
-            tagsContainer.innerHTML += `
-                <span class="stock-tag high">
-                    ${highStock} In Stock
-                </span>
-            `;
-        }
-    }
-
-    setupEventListeners() {
-        // Search with debounce
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            clearTimeout(this.debounceTimer);
-            this.debounceTimer = setTimeout(() => {
-                this.searchMedicines(e.target.value);
-            }, 300);
-        });
-
-        document.getElementById('addMedicineBtn').addEventListener('click', () => this.openMedicineForm());
-        document.getElementById('closeModal').addEventListener('click', () => this.closeMedicineForm());
-        document.getElementById('cancelMedicineBtn').addEventListener('click', () => this.closeMedicineForm());
-        document.querySelector('.btn-round.refresh').addEventListener('click', () => this.loadMedicines());
-        document.getElementById('exportBtn').addEventListener('click', () => this.exportData());
-        document.getElementById('printBtn').addEventListener('click', () => this.printReport());
-
-        // ---------------- Quick Actions ----------------
-        document.querySelectorAll('.summary-card button')[0].addEventListener('click', () => {
-            this.showToast('Generating stock report...', 'success');
-            this.printReport();
-        });
-        document.querySelectorAll('.summary-card button')[1].addEventListener('click', () => {
-            this.showToast('Checking expiry dates...', 'info');
-            this.checkExpiryDates();
-        });
-        document.querySelectorAll('.summary-card button')[2].addEventListener('click', () => {
-            this.showToast('Notifying suppliers...', 'info');
-            this.notifySuppliers();
-        });
-        document.querySelectorAll('.summary-card button')[3].addEventListener('click', () => {
-            this.showToast('Opening analytics...', 'info');
-            this.viewAnalytics();
+    
+    // Close modal when clicking outside
+    if (elements.medicineModal) {
+        elements.medicineModal.addEventListener('click', (e) => {
+            if (e.target === elements.medicineModal) closeMedicineForm();
         });
     }
-
-    setupFormValidation() {
-        const form = document.getElementById('medicineForm');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (this.validateForm()) this.saveMedicine();
-        });
+    
+    // Action buttons
+    if (elements.printBtn) {
+        elements.printBtn.addEventListener('click', printReport);
     }
-
-    validateForm() {
-        const name = document.getElementById('medicineName').value.trim();
-        const price = parseFloat(document.getElementById('medicinePrice').value);
-        const quantity = parseInt(document.getElementById('medicineQuantity').value);
-        const expDateVal = document.getElementById('medicineExpiration').value;
-        const expDate = expDateVal ? new Date(expDateVal) : null;
-
-        if (!name) { this.showToast('Please enter medicine name', 'error'); return false; }
-        if (isNaN(price) || price <= 0) { this.showToast('Please enter a valid price', 'error'); return false; }
-        if (isNaN(quantity) || quantity < 0) { this.showToast('Please enter a valid quantity', 'error'); return false; }
-        if (expDate && expDate < new Date()) { this.showToast('Expiration date cannot be in the past', 'error'); return false; }
-
-        return true;
+    
+    if (elements.exportBtn) {
+        elements.exportBtn.addEventListener('click', exportToCSV);
     }
-
-    openMedicineForm(medicine = null) {
-        this.currentMedicine = medicine;
-        const modal = document.getElementById('medicineModal');
-        const form = document.getElementById('medicineForm');
-        const title = document.getElementById('modalTitle');
-
-        if (medicine) {
-            title.textContent = 'Edit Medicine';
-            document.getElementById('medicineName').value = medicine.name;
-            document.getElementById('medicineDescription').value = medicine.description || '';
-            document.getElementById('medicineCategory').value = medicine.category || '';
-            document.getElementById('medicineManufacturer').value = medicine.manufacturer || '';
-            document.getElementById('medicinePrice').value = medicine.price || '';
-            document.getElementById('medicineQuantity').value = medicine.quantity || '';
-            document.getElementById('medicineExpiration').value = medicine.expiration_date || '';
-            document.getElementById('medicineBatch').value = medicine.batch_number || '';
-        } else {
-            title.textContent = 'Add New Medicine';
-            form.reset();
-        }
-
-        modal.style.display = 'flex';
+    
+    if (elements.generateReportBtn) {
+        elements.generateReportBtn.addEventListener('click', generateReport);
     }
-
-    closeMedicineForm() {
-        document.getElementById('medicineModal').style.display = 'none';
-        document.getElementById('medicineForm').reset();
-        this.currentMedicine = null;
+    
+    if (elements.checkExpiryBtn) {
+        elements.checkExpiryBtn.addEventListener('click', checkExpiryDates);
     }
-
-    async saveMedicine() {
-        if (!this.validateForm()) return;
-
-        const formData = {
-            name: document.getElementById('medicineName').value.trim(),
-            description: document.getElementById('medicineDescription').value.trim(),
-            category: document.getElementById('medicineCategory').value,
-            manufacturer: document.getElementById('medicineManufacturer').value.trim(),
-            price: parseFloat(document.getElementById('medicinePrice').value),
-            quantity: parseInt(document.getElementById('medicineQuantity').value),
-            expiration_date: document.getElementById('medicineExpiration').value,
-            batch_number: document.getElementById('medicineBatch').value.trim()
-        };
-
-        try {
-            const method = this.currentMedicine ? 'PUT' : 'POST';
-            const url = this.currentMedicine 
-                ? `/medicine-stock/api/medicines/${this.currentMedicine.id}` 
-                : '/medicine-stock/api/medicines';
-
-            const response = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-
-            if (!response.ok) throw new Error('Failed to save medicine');
-
-            this.showToast(this.currentMedicine ? 'Medicine updated successfully' : 'Medicine added successfully', 'success');
-            this.closeMedicineForm();
-            this.loadMedicines();
-
-        } catch (error) {
-            this.showToast('Error saving medicine', 'error');
-        }
+    
+    if (elements.notifySuppliersBtn) {
+        elements.notifySuppliersBtn.addEventListener('click', notifySuppliers);
     }
-
-    async editMedicine(id) {
-        const medicine = this.medicines.find(med => med.id === id);
-        if (medicine) this.openMedicineForm(medicine);
+    
+    if (elements.emailReportBtn) {
+        elements.emailReportBtn.addEventListener('click', emailReport);
     }
-
-    async deleteMedicine(id) {
-        if (!confirm('Are you sure you want to delete this medicine?')) return;
-        try {
-            const response = await fetch(`/medicine-stock/api/medicines/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Failed to delete medicine');
-            this.showToast('Medicine deleted successfully', 'success');
-            this.loadMedicines();
-        } catch (error) {
-            this.showToast('Error deleting medicine', 'error');
-        }
-    }
-
-    async searchMedicines(query) {
-        try {
-            const response = await fetch(`/medicine-stock/api/medicines/search?q=${encodeURIComponent(query)}`);
-            if (!response.ok) throw new Error('Search failed');
-            this.medicines = await response.json();
-        } catch {
-            this.medicines = this.medicines.filter(med => 
-                med.name.toLowerCase().includes(query.toLowerCase()) ||
-                (med.description && med.description.toLowerCase().includes(query.toLowerCase())) ||
-                (med.category && med.category.toLowerCase().includes(query.toLowerCase())) ||
-                (med.manufacturer && med.manufacturer.toLowerCase().includes(query.toLowerCase()))
-            );
-        }
-        this.renderMedicines();
-        this.updateSummary();
-    }
-
-    exportData() {
-        const data = this.medicines.map(med => ({
-            Name: med.name,
-            Description: med.description,
-            Category: med.category,
-            Manufacturer: med.manufacturer,
-            Price: med.price,
-            Quantity: med.quantity,
-            'Expiration Date': med.expiration_date,
-            'Batch Number': med.batch_number,
-            Status: this.getStockStatus(med.quantity)
-        }));
-
-        const csv = this.convertToCSV(data);
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `medicine-stock-${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-
-        this.showToast('Data exported successfully', 'success');
-    }
-
-    convertToCSV(data) {
-        const headers = Object.keys(data[0]);
-        const rows = data.map(row => headers.map(h => JSON.stringify(row[h])).join(','));
-        return [headers.join(','), ...rows].join('\n');
-    }
-
-    printReport() {
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Medicine Stock Report</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    h1 { color: #333; }
-                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f4f4f4; }
-                    .status { padding: 4px 8px; border-radius: 12px; font-size: 12px; }
-                    .in-stock { background: #dcfce7; color: #16a34a; }
-                    .low-stock { background: #fef3c7; color: #f97316; }
-                    .out-of-stock { background: #fee2e2; color: #dc2626; }
-                    .summary { background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; }
-                </style>
-            </head>
-            <body>
-                <h1>Medicine Stock Report</h1>
-                <p>Generated on: ${new Date().toLocaleDateString()}</p>
-                <div class="summary">
-                    <h2>Summary</h2>
-                    <p>Total Medicines: ${this.medicines.length}</p>
-                    <p>Total Value: $${this.medicines.reduce((sum, med) => sum + (med.price * med.quantity), 0).toFixed(2)}</p>
-                    <p>Low Stock Items: ${this.medicines.filter(m => m.quantity <= 10 && m.quantity > 0).length}</p>
-                    <p>Out of Stock: ${this.medicines.filter(m => m.quantity === 0).length}</p>
-                </div>
-                <h2>Medicine Details</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Manufacturer</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Status</th>
-                            <th>Expiration Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${this.medicines.map(m => `
-                            <tr>
-                                <td>${m.name}</td>
-                                <td>${m.category}</td>
-                                <td>${m.manufacturer}</td>
-                                <td>$${m.price.toFixed(2)}</td>
-                                <td>${m.quantity}</td>
-                                <td>
-                                    <span class="status ${this.getStatusClass(this.getStockStatus(m.quantity))}">
-                                        ${this.getStockStatus(m.quantity)}
-                                    </span>
-                                </td>
-                                <td>${m.expiration_date || 'N/A'}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-    }
-
-    // ---------------- Quick Actions Methods ----------------
-    checkExpiryDates() {
-        const expired = this.medicines.filter(m => m.expiration_date && new Date(m.expiration_date) < new Date());
-        if(expired.length) {
-            this.showToast(`${expired.length} medicines are expired!`, 'error');
-        } else {
-            this.showToast('No expired medicines found', 'success');
-        }
-    }
-
-    notifySuppliers() {
-        this.showToast('Suppliers have been notified!', 'success');
-    }
-
-    viewAnalytics() {
-        this.showToast('Analytics opened (demo)', 'success');
-    }
-
-    showToast(message, type = 'info') {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.className = 'toast visible';
-        toast.style.background = type === 'success' ? '#16a34a' : type === 'error' ? '#dc2626' : '#111827';
-        setTimeout(() => { toast.className = 'toast'; }, 3000);
+    
+    if (elements.syncInventoryBtn) {
+        elements.syncInventoryBtn.addEventListener('click', syncInventory);
     }
 }
 
-// Initialize
-const stockManager = new MedicineStockManager();
+// ================= API Functions =================
+async function loadMedicines() {
+    try {
+        showLoadingState();
+        
+        const response = await fetch(API_BASE);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        medicines = await response.json();
+        renderMedicines(medicines);
+        updateStats();
+        updateStockTags();
+        
+        showToast('Medicines loaded successfully', 'success');
+    } catch (error) {
+        console.error('Error loading medicines:', error);
+        showErrorState();
+        showToast('Failed to load medicines: ' + error.message, 'error');
+    }
+}
+
+async function saveMedicine(medicineData) {
+    try {
+        // Disable save button and show loading
+        if (elements.saveMedicineBtn) {
+            elements.saveMedicineBtn.disabled = true;
+            const originalText = elements.saveMedicineBtn.innerHTML;
+            elements.saveMedicineBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            // Handle the reset after save
+            setTimeout(() => {
+                elements.saveMedicineBtn.disabled = false;
+                elements.saveMedicineBtn.innerHTML = originalText;
+            }, 1000);
+        }
+        
+        const method = isEditing ? 'PUT' : 'POST';
+        const url = isEditing ? `${API_BASE}/${currentMedicineId}` : API_BASE;
+        
+        // Convert expiration_date to proper format
+        const dataToSend = {
+            ...medicineData,
+            expiration_date: medicineData.expiration_date || null
+        };
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to save medicine');
+        }
+        
+        const savedMedicine = await response.json();
+        
+        if (isEditing) {
+            // Update existing medicine
+            const index = medicines.findIndex(m => m.id === currentMedicineId);
+            if (index !== -1) medicines[index] = savedMedicine;
+        } else {
+            // Add new medicine
+            medicines.push(savedMedicine);
+        }
+        
+        renderMedicines(medicines);
+        updateStats();
+        updateStockTags();
+        closeMedicineForm();
+        
+        showToast(`Medicine ${isEditing ? 'updated' : 'added'} successfully`, 'success');
+    } catch (error) {
+        console.error('Error saving medicine:', error);
+        showToast('Failed to save medicine: ' + error.message, 'error');
+    }
+}
+
+async function deleteMedicine(id) {
+    if (!confirm('Are you sure you want to delete this medicine? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/${id}`, { 
+            method: 'DELETE' 
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to delete medicine');
+        }
+        
+        medicines = medicines.filter(m => m.id !== id);
+        renderMedicines(medicines);
+        updateStats();
+        updateStockTags();
+        
+        showToast('Medicine deleted successfully', 'success');
+    } catch (error) {
+        console.error('Error deleting medicine:', error);
+        showToast('Failed to delete medicine: ' + error.message, 'error');
+    }
+}
+
+// ================= Render Functions =================
+function renderMedicines(medicinesList) {
+    if (!elements.medicineTableBody) return;
+    
+    if (!medicinesList || medicinesList.length === 0) {
+        elements.medicineTableBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h4>No Medicines Found</h4>
+                    <p>Add your first medicine to get started</p>
+                    <button class="btn-primary" onclick="openMedicineForm()">
+                        <i class="fas fa-plus"></i> Add Medicine
+                    </button>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    elements.medicineTableBody.innerHTML = medicinesList.map(medicine => `
+        <tr>
+            <td>
+                <div class="medicine-info">
+                    <div class="medicine-name">${escapeHtml(medicine.name)}</div>
+                    ${medicine.description ? `<div class="medicine-description">${escapeHtml(medicine.description)}</div>` : ''}
+                    ${medicine.batch_number ? `<div class="medicine-batch">Batch: ${escapeHtml(medicine.batch_number)}</div>` : ''}
+                </div>
+            </td>
+            <td>
+                <span class="category-badge">${medicine.category || 'Uncategorized'}</span>
+            </td>
+            <td>${medicine.manufacturer || '-'}</td>
+            <td class="price-cell">$${parseFloat(medicine.price || 0).toFixed(2)}</td>
+            <td>
+                ${getStatusBadge(medicine.quantity || 0)}
+            </td>
+            <td>
+                <span class="quantity-display ${(medicine.quantity || 0) <= LOW_STOCK_THRESHOLD ? 'low-quantity' : ''}">
+                    ${medicine.quantity || 0}
+                    ${(medicine.quantity || 0) > 0 && (medicine.quantity || 0) <= LOW_STOCK_THRESHOLD ? 
+                        '<span class="low-stock-indicator">!</span>' : ''}
+                </span>
+            </td>
+            <td>
+                ${medicine.expiration_date ? formatDate(medicine.expiration_date) : 'No expiry'}
+                ${medicine.expiration_date && isExpiringSoon(medicine.expiration_date) ? 
+                    '<span class="expiry-warning">⚠️ Soon</span>' : ''}
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn edit-btn" onclick="editMedicine(${medicine.id})" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteMedicine(${medicine.id})" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function getStatusBadge(quantity) {
+    if (quantity === 0) {
+        return `<span class="status-badge out-of-stock">
+            <span class="dot"></span>
+            Out of Stock
+        </span>`;
+    } else if (quantity <= LOW_STOCK_THRESHOLD) {
+        return `<span class="status-badge low-stock">
+            <span class="dot"></span>
+            Low Stock
+        </span>`;
+    } else {
+        return `<span class="status-badge in-stock">
+            <span class="dot"></span>
+            In Stock
+        </span>`;
+    }
+}
+
+function showLoadingState() {
+    if (!elements.medicineTableBody) return;
+    
+    elements.medicineTableBody.innerHTML = `
+        <tr>
+            <td colspan="8" class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading medicines...</p>
+            </td>
+        </tr>
+    `;
+}
+
+function showErrorState() {
+    if (!elements.medicineTableBody) return;
+    
+    elements.medicineTableBody.innerHTML = `
+        <tr>
+            <td colspan="8" class="error-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4>Unable to Load Data</h4>
+                <p>Please check your connection and try again</p>
+                <button class="btn-secondary" onclick="loadMedicines()">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </td>
+        </tr>
+    `;
+}
+
+// ================= Stats Functions =================
+function updateStats() {
+    const totalMedicines = medicines.length;
+    const totalItems = medicines.reduce((sum, m) => sum + (parseInt(m.quantity) || 0), 0);
+    const totalValue = medicines.reduce((sum, m) => sum + (parseFloat(m.price || 0) * (parseInt(m.quantity) || 0)), 0);
+    const lowStockCount = medicines.filter(m => (parseInt(m.quantity) || 0) > 0 && (parseInt(m.quantity) || 0) <= LOW_STOCK_THRESHOLD).length;
+    const outOfStockCount = medicines.filter(m => (parseInt(m.quantity) || 0) === 0).length;
+    
+    if (elements.totalMedicines) elements.totalMedicines.textContent = totalMedicines;
+    if (elements.totalItems) elements.totalItems.textContent = totalItems;
+    if (elements.totalValue) elements.totalValue.textContent = `$${totalValue.toFixed(2)}`;
+    if (elements.lowStock) elements.lowStock.textContent = lowStockCount;
+    if (elements.outOfStock) elements.outOfStock.textContent = outOfStockCount;
+    if (elements.netValue) elements.netValue.textContent = `$${totalValue.toFixed(2)}`;
+}
+
+function updateStockTags() {
+    if (!elements.stockTags) return;
+    
+    const tags = [];
+    const total = medicines.length;
+    const lowStockCount = medicines.filter(m => (parseInt(m.quantity) || 0) > 0 && (parseInt(m.quantity) || 0) <= LOW_STOCK_THRESHOLD).length;
+    const outOfStockCount = medicines.filter(m => (parseInt(m.quantity) || 0) === 0).length;
+    const expiringSoon = medicines.filter(m => isExpiringSoon(m.expiration_date)).length;
+    
+    if (total === 0) {
+        tags.push('<span class="stock-tag empty">Empty Inventory</span>');
+    } else {
+        if (total > 0) {
+            tags.push(`<span class="stock-tag total">${total} Items</span>`);
+        }
+        if (outOfStockCount > 0) {
+            tags.push(`<span class="stock-tag danger">${outOfStockCount} Out of Stock</span>`);
+        }
+        if (lowStockCount > 0) {
+            tags.push(`<span class="stock-tag warning">${lowStockCount} Low Stock</span>`);
+        }
+        if (expiringSoon > 0) {
+            tags.push(`<span class="stock-tag warning">${expiringSoon} Expiring Soon</span>`);
+        }
+    }
+    
+    elements.stockTags.innerHTML = tags.join('');
+}
+
+// ================= Modal Functions =================
+function openMedicineForm(medicine = null) {
+    isEditing = !!medicine;
+    currentMedicineId = medicine?.id || null;
+    
+    if (elements.modalTitle) {
+        elements.modalTitle.textContent = isEditing ? 'Edit Medicine' : 'Add New Medicine';
+    }
+    
+    // Reset form
+    if (elements.medicineForm) {
+        elements.medicineForm.reset();
+    }
+    
+    // Fill form if editing
+    if (medicine) {
+        if (elements.medicineName) elements.medicineName.value = medicine.name || '';
+        if (elements.medicineDescription) elements.medicineDescription.value = medicine.description || '';
+        if (elements.medicineCategory) elements.medicineCategory.value = medicine.category || '';
+        if (elements.medicineManufacturer) elements.medicineManufacturer.value = medicine.manufacturer || '';
+        if (elements.medicinePrice) elements.medicinePrice.value = medicine.price || '';
+        if (elements.medicineQuantity) elements.medicineQuantity.value = medicine.quantity || '';
+        if (elements.medicineBatch) elements.medicineBatch.value = medicine.batch_number || '';
+        
+        if (medicine.expiration_date && elements.medicineExpiration) {
+            elements.medicineExpiration.value = medicine.expiration_date;
+        } else if (elements.medicineExpiration) {
+            elements.medicineExpiration.value = '';
+        }
+    }
+    
+    // Show modal with animation
+    if (elements.medicineModal) {
+        elements.medicineModal.style.display = 'flex';
+        setTimeout(() => {
+            elements.medicineModal.classList.add('show');
+            if (elements.medicineName) elements.medicineName.focus();
+        }, 10);
+    }
+}
+
+function closeMedicineForm() {
+    if (elements.medicineModal) {
+        elements.medicineModal.classList.remove('show');
+        setTimeout(() => {
+            elements.medicineModal.style.display = 'none';
+            if (elements.medicineForm) elements.medicineForm.reset();
+            isEditing = false;
+            currentMedicineId = null;
+        }, 300);
+    }
+}
+
+function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    // Validate required fields
+    if (!elements.medicineName || !elements.medicineName.value.trim()) {
+        showToast('Medicine name is required', 'error');
+        if (elements.medicineName) elements.medicineName.focus();
+        return;
+    }
+    
+    if (!elements.medicinePrice || !elements.medicinePrice.value || parseFloat(elements.medicinePrice.value) <= 0) {
+        showToast('Valid price is required', 'error');
+        if (elements.medicinePrice) elements.medicinePrice.focus();
+        return;
+    }
+    
+    if (!elements.medicineQuantity || !elements.medicineQuantity.value || parseInt(elements.medicineQuantity.value) < 0) {
+        showToast('Valid quantity is required', 'error');
+        if (elements.medicineQuantity) elements.medicineQuantity.focus();
+        return;
+    }
+    
+    const medicineData = {
+        name: elements.medicineName.value.trim(),
+        description: elements.medicineDescription ? elements.medicineDescription.value.trim() : '',
+        category: elements.medicineCategory ? elements.medicineCategory.value : '',
+        manufacturer: elements.medicineManufacturer ? elements.medicineManufacturer.value.trim() : '',
+        price: parseFloat(elements.medicinePrice.value),
+        quantity: parseInt(elements.medicineQuantity.value),
+        expiration_date: elements.medicineExpiration && elements.medicineExpiration.value ? elements.medicineExpiration.value : null,
+        batch_number: elements.medicineBatch ? elements.medicineBatch.value.trim() : ''
+    };
+    
+    saveMedicine(medicineData);
+}
+
+// ================= Utility Functions =================
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+function searchMedicines() {
+    if (!elements.searchInput) return;
+    
+    const query = elements.searchInput.value.toLowerCase().trim();
+    
+    if (!query) {
+        renderMedicines(medicines);
+        return;
+    }
+    
+    const filtered = medicines.filter(medicine => {
+        const searchableFields = [
+            medicine.name,
+            medicine.description,
+            medicine.category,
+            medicine.manufacturer,
+            medicine.batch_number
+        ].filter(Boolean).join(' ').toLowerCase();
+        
+        return searchableFields.includes(query);
+    });
+    
+    renderMedicines(filtered);
+}
+
+function updateLastUpdated() {
+    if (!elements.lastUpdated) return;
+    
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+    elements.lastUpdated.textContent = timeString;
+}
+
+function showToast(message, type = 'info') {
+    if (!elements.toast) return;
+    
+    elements.toast.textContent = message;
+    elements.toast.className = `toast ${type} show`;
+    
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+        elements.toast.classList.remove('show');
+    }, 3000);
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+function isExpiringSoon(dateString) {
+    if (!dateString) return false;
+    const today = new Date();
+    const expiryDate = new Date(dateString);
+    const diffTime = expiryDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 && diffDays <= 30;
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ================= Action Functions =================
+function printReport() {
+    showToast('Preparing print report...', 'info');
+    setTimeout(() => {
+        window.print();
+        showToast('Print sent to printer', 'success');
+    }, 1000);
+}
+
+function exportToCSV() {
+    if (medicines.length === 0) {
+        showToast('No data to export', 'warning');
+        return;
+    }
+    
+    const headers = ['Name', 'Description', 'Category', 'Manufacturer', 'Price', 'Quantity', 'Expiration Date', 'Batch Number', 'Status'];
+    
+    const csvRows = medicines.map(medicine => {
+        const status = (medicine.quantity || 0) === 0 ? 'Out of Stock' : 
+                      (medicine.quantity || 0) <= LOW_STOCK_THRESHOLD ? 'Low Stock' : 'In Stock';
+        
+        return [
+            `"${(medicine.name || '').replace(/"/g, '""')}"`,
+            `"${(medicine.description || '').replace(/"/g, '""')}"`,
+            `"${(medicine.category || '').replace(/"/g, '""')}"`,
+            `"${(medicine.manufacturer || '').replace(/"/g, '""')}"`,
+            medicine.price || 0,
+            medicine.quantity || 0,
+            medicine.expiration_date || '',
+            `"${(medicine.batch_number || '').replace(/"/g, '""')}"`,
+            status
+        ].join(',');
+    });
+    
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `medicine-stock-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showToast('Data exported to CSV', 'success');
+}
+
+function generateReport() {
+    showToast('Stock report generated', 'success');
+}
+
+function checkExpiryDates() {
+    const expiringSoon = medicines.filter(m => isExpiringSoon(m.expiration_date));
+    const expired = medicines.filter(m => {
+        if (!m.expiration_date) return false;
+        const expiryDate = new Date(m.expiration_date);
+        return expiryDate < new Date();
+    });
+    
+    let message = '';
+    if (expired.length > 0) {
+        message += `${expired.length} medicine(s) have expired.\n`;
+    }
+    if (expiringSoon.length > 0) {
+        message += `${expiringSoon.length} medicine(s) will expire within 30 days.`;
+    }
+    
+    if (message) {
+        alert(`Expiry Check Results:\n${message}`);
+    } else {
+        alert('All medicines are within expiry date.');
+    }
+    
+    showToast('Expiry check completed', 'info');
+}
+
+function notifySuppliers() {
+    showToast('Suppliers notified successfully', 'success');
+}
+
+function emailReport() {
+    showToast('Report emailed successfully', 'success');
+}
+
+function syncInventory() {
+    showToast('Inventory synchronized', 'success');
+    loadMedicines();
+}
+
+// ================= Global Functions =================
+window.editMedicine = function(id) {
+    const medicine = medicines.find(m => m.id === id);
+    if (medicine) {
+        openMedicineForm(medicine);
+    }
+};
+
+window.deleteMedicine = deleteMedicine;

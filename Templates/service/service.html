@@ -2,93 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Clinic Dashboard - Services Grid</title>
+    <title>Services Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="app-shell">
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">🏥</div>
                 <div>
-                    <div class="sidebar-title">Preclinic</div>
-                    <div class="sidebar-subtitle">Clinic Module</div>
+                    <div class="sidebar-title">Clinic Ease</div>
+                    <div class="sidebar-subtitle">Services Module</div>
                 </div>
             </div>
 
             <div class="sidebar-section-title">Main Menu</div>
             <ul class="nav-list">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="icon">📊</span>
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="icon">👨‍⚕️</span>
-                        Doctors
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="icon">👤</span>
-                        Patients
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="icon">📅</span>
-                        Appointments
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="icon">📍</span>
-                        Locations
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">
-                        <span class="icon">🩺</span>
-                        Services
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="icon">🎓</span>
-                        Specializations
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="icon">💼</span>
-                        Assets
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="icon">📝</span>
-                        Activities
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="icon">💬</span>
-                        Messages
-                    </a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="#"><span class="icon">📊</span>Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="#"><span class="icon">👨‍⚕</span>Doctors</a></li>
+                <li class="nav-item"><a class="nav-link" href="#"><span class="icon">👤</span>Patients</a></li>
+                <li class="nav-item"><a class="nav-link" href="#"><span class="icon">📅</span>Appointments</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/service"><span class="icon">🩺</span>Services</a></li>
             </ul>
 
             <div class="sidebar-footer">
-                <div><strong>TruCare Clinic</strong></div>
+                <div><strong>You Just Now Clinic</strong></div>
                 <div>Services v2.0</div>
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="main">
+            <!-- Top Bar -->
             <div class="topbar">
                 <div class="search-wrapper">
                     <span class="search-icon">🔍</span>
@@ -97,40 +45,33 @@
                 </div>
 
                 <div class="topbar-actions">
-                    <button class="chip-ai" type="button" onclick="showAIAssistance()">
+                    <button class="chip-ai" id="aiHelperBtn">
                         <span class="icon">⚡</span>
                         <span>AI Assistance</span>
                     </button>
-                    <button class="btn-round" type="button" title="Notifications">🔔</button>
-                    <div class="avatar">AD</div>
+                    <div class="avatar-container">
+                        <div class="avatar">AD</div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Page Header -->
             <div class="page-header">
                 <div class="page-header-left">
                     <h1>Services Grid</h1>
                     <span id="serviceCountSubtitle">All medical services offered</span>
                 </div>
+
                 <div class="page-header-right">
                     <div class="filter-group">
-                        <label class="filter-label" for="departmentFilter">Department</label>
+                        <label for="departmentFilter">Department</label>
                         <select id="departmentFilter" class="select-input">
                             <option value="">All Departments</option>
-                            <option value="General Medicine">General Medicine</option>
-                            <option value="Dentistry">Dentistry</option>
-                            <option value="Ophthalmology">Ophthalmology</option>
-                            <option value="Radiology">Radiology</option>
-                            <option value="Physiotherapy">Physiotherapy</option>
-                            <option value="Cardiology">Cardiology</option>
-                            <option value="Dermatology">Dermatology</option>
-                            <option value="Pathology">Pathology</option>
-                            <option value="ENT">ENT</option>
-                            <option value="Nutrition">Nutrition</option>
                         </select>
                     </div>
 
                     <div class="filter-group">
-                        <label class="filter-label" for="statusFilter">Status</label>
+                        <label for="statusFilter">Status</label>
                         <select id="statusFilter" class="select-input">
                             <option value="">All Status</option>
                             <option value="Active">Active</option>
@@ -139,9 +80,8 @@
                     </div>
 
                     <div class="filter-group">
-                        <label class="filter-label" for="sortSelect">Sort</label>
+                        <label for="sortSelect">Sort</label>
                         <select id="sortSelect" class="select-input">
-                            <option value="recent">Recent (Newest)</option>
                             <option value="name-asc">Name (A–Z)</option>
                             <option value="name-desc">Name (Z–A)</option>
                             <option value="price-asc">Price (Low–High)</option>
@@ -149,158 +89,75 @@
                         </select>
                     </div>
 
-                    <button class="btn-primary" type="button" onclick="openNewServiceModal()">
+                    <button class="btn-primary" id="addServiceBtn">
                         <span class="icon">＋</span>
                         <span>New Service</span>
                     </button>
                 </div>
             </div>
 
+            <!-- Content Card -->
             <section class="content-card">
                 <div class="content-toolbar">
                     <div class="content-toolbar-left">
-                        <div class="pill-count" id="serviceCountPill">{{ total_services }} services</div>
+                        <div class="pill-count" id="serviceCountPill">0 services</div>
                         <span id="filterSummary">Showing all services</span>
                     </div>
-
-                    <div class="content-toolbar-right">
-                        <div class="chip-legend">
-                            <span><span class="dot dot-success"></span> Active</span>
-                            <span><span class="dot dot-warning"></span> Inactive</span>
-                        </div>
-                    </div>
                 </div>
 
-                <div class="service-grid" id="serviceGrid">
-                    {% if services %}
-                        {% for service in services %}
-                        <div class="service-card" 
-                             data-id="{{ service.service_id }}" 
-                             data-name="{{ service.service_name }}" 
-                             data-department="{{ service.department }}" 
-                             data-price="{{ service.price }}" 
-                             data-status="{{ service.status }}">
-                            
-                            <div class="service-card-header">
-                                <div class="service-avatar">
-                                    {{ service.service_name[:2]|upper }}
-                                </div>
-                                <div>
-                                    <div class="service-title">{{ service.service_name }}</div>
-                                    <div class="service-subtitle">{{ service.department }}</div>
-                                </div>
-                            </div>
-                            
-                            <div class="badge-id">ID: {{ service.service_id }}</div>
-                            
-                            <div class="service-meta">
-                                <div>
-                                    <div>Price</div>
-                                    <strong>${{ "%.2f"|format(service.price) }}</strong>
-                                </div>
-                                <div>
-                                    <div>Status</div>
-                                    <strong class="status-{{ service.status|lower }}">
-                                        {{ service.status }}
-                                    </strong>
-                                </div>
-                            </div>
-
-                            <div class="service-footer">
-                                <div class="service-status">
-                                    <span class="dot dot-{{ 'success' if service.status == 'Active' else 'warning' }}"></span>
-                                    {{ service.status }}
-                                </div>
-                                <div class="card-actions">
-                                    <button class="btn-mini" onclick="editService({{ service.service_id }})">
-                                        Edit
-                                    </button>
-                                    <button class="btn-mini danger" onclick="deleteService({{ service.service_id }})">
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <div class="empty-icon">🩺</div>
-                            <h3>No Services Found</h3>
-                            <p>No services in the database</p>
-                            <button class="btn-primary" onclick="openNewServiceModal()">
-                                <span class="icon">＋</span>
-                                <span>Add Service</span>
-                            </button>
-                        </div>
-                    {% endif %}
-                </div>
+                <!-- Services Grid -->
+                <div class="service-grid" id="serviceGrid"></div>
             </section>
         </main>
     </div>
 
-    <div id="toast" class="toast hidden">
-        <div id="toastMessage"></div>
-    </div>
-
-    <div id="serviceModal" class="modal-overlay hidden">
+    <!-- Modal for Add/Edit Service -->
+    <div class="modal-overlay hidden" id="serviceModal">
         <div class="modal-container">
             <div class="modal-header">
                 <h2 id="modalTitle">Add New Service</h2>
-                <button class="modal-close" onclick="closeServiceModal()" type="button">&times;</button>
+                <button type="button" class="modal-close">&times;</button>
             </div>
-            <form id="serviceForm" class="modal-form" onsubmit="return false;">
-    <!-- ... inputs ... -->
-</form>
-                <input type="hidden" id="service_id" name="service_id">
-                
+
+            <form id="serviceForm" class="modal-form">
+                <input type="hidden" id="service_id">
+
                 <div class="form-group">
-                    <label for="service_name">Service Name <span class="required">*</span></label>
-                    <input type="text" id="service_name" name="service_name" required 
-                           placeholder="Enter service name" />
+                    <label>Service Name <span class="required">*</span></label>
+                    <input type="text" id="service_name" required>
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="department">Department <span class="required">*</span></label>
-                    <select id="department" name="department" required>
-                        <option value="">Select Department</option>
-                        <option value="General Medicine">General Medicine</option>
-                        <option value="Dentistry">Dentistry</option>
-                        <option value="Ophthalmology">Ophthalmology</option>
-                        <option value="Radiology">Radiology</option>
-                        <option value="Physiotherapy">Physiotherapy</option>
-                        <option value="Cardiology">Cardiology</option>
-                        <option value="Dermatology">Dermatology</option>
-                        <option value="Pathology">Pathology</option>
-                        <option value="ENT">ENT</option>
-                        <option value="Nutrition">Nutrition</option>
+                    <label>Department <span class="required">*</span></label>
+                    <input type="text" id="department" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Price ($) <span class="required">*</span></label>
+                    <input type="number" id="price" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Status <span class="required">*</span></label>
+                    <select id="status" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
                     </select>
                 </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="price">Price ($) <span class="required">*</span></label>
-                        <input type="number" id="price" name="price" required min="0" step="0.01" 
-                               placeholder="0.00" />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="status">Status <span class="required">*</span></label>
-                        <select id="status" name="status" required>
-                            <option value="">Select Status</option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-                
+
                 <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeServiceModal()">Cancel</button>
+                    <button type="button" class="btn-cancel">Cancel</button>
                     <button type="submit" class="btn-submit">Save Service</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='scripts/service.js') }}"></script>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden">
+        <div id="toastMessage"></div>
+    </div>
+
+    <script src="/static/js/service.js"></script>
 </body>
 </html>

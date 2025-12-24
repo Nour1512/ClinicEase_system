@@ -1,58 +1,80 @@
 from core.db_singleton import DatabaseConnection
+from models.service import Service
 
 class ServiceRepository:
     def __init__(self):
         self.db = DatabaseConnection()
-    
+
     def get_all_services(self):
-     
-        query = """
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
             SELECT Service_ID, Service_Name, Department, Price, Status, Created_At
             FROM Services
             ORDER BY Created_At DESC
-        """
-        conn = self.db.get_connection()
-        cursor = conn.cursor()
-        cursor.execute(query)
-        
-        services = []
-        for row in cursor.fetchall():
-            services.append({
-                'service_id': row[0],
-                'service_name': row[1],
-                'department': row[2],
-                'price': float(row[3]),
-                'status': row[4],
-                'created_at': row[5]
-            })
-        
+        """)
+        rows = cursor.fetchall()
         conn.close()
-        return services
-    
-    def get_total_services(self):
-      
-        query = "SELECT COUNT(*) FROM Services"
-        conn = self.db.get_connection()
-        cursor = conn.cursor()
-        cursor.execute(query)
-        count = cursor.fetchone()[0]
-        conn.close()
-        return count
-    
-    def add_service(self, service_data):
+        return [Service(*row) for row in rows]
 
-        query = """
+    def get_total_services(self):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Services")
+        total = cursor.fetchone()[0]
+        conn.close()
+        return total
+
+    def add_service(self, data):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
             INSERT INTO Services (Service_Name, Department, Price, Status)
             VALUES (?, ?, ?, ?)
-        """
-        conn = self.db.get_connection()
-        cursor = conn.cursor()
-        cursor.execute(query, (
-            service_data['service_name'],
-            service_data['department'],
-            service_data['price'],
-            service_data['status']
+        """, (
+            data['service_name'],
+            data['department'],
+            data['price'],
+            data['status']
         ))
         conn.commit()
         conn.close()
-    
+
+    def update_service(self, data):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE Services
+            SET Service_Name=?, Department=?, Price=?, Status=?
+            WHERE Service_ID=?
+        """, (
+            data['service_name'],
+            data['department'],
+            data['price'],
+            data['status'],
+            data['service_id']
+        ))
+        conn.commit()
+        conn.close()
+
+    def delete_service(self, service_id):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM Services WHERE Service_ID=?", (service_id,))
+        if cursor.rowcount == 0:
+            conn.close()
+            raise Exception("Service not found")
+        conn.commit()
+
+
+    def search_services(self, keyword):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT Service_ID, Service_Name, Department, Price, Status, Created_At
+            FROM Services
+            WHERE Service_Name LIKE ? OR Department LIKE ?
+        """, (f"%{keyword}%", f"%{keyword}%"))
+        rows = cursor.fetchall()
+        conn.close()
+        return [Service(*row) for row in rows]
