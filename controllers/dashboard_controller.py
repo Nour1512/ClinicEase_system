@@ -12,6 +12,12 @@ def dashboard():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
     
+    # role = session.get("role")
+    # if role == "patient":
+    #     return redirect("/pharmacy")
+    # elif role == "doctor":
+    #     return redirect("/patients")
+
     user_role = session.get("role", "patient")
     user_name = session.get("name", "User")
     
@@ -25,12 +31,18 @@ def dashboard():
     revenue_data = dashboard_repo.get_revenue_by_month()
     
     # Prepare specialty data for pie chart
-    specialty_labels = [item["specialty"] for item in specialty_data]
-    specialty_counts = [item["count"] for item in specialty_data]
+    # specialty_labels = [item["specialty"] for item in specialty_data]
+    # specialty_counts = [item["count"] for item in specialty_data]
     
     # Prepare revenue data for line chart
-    revenue_months = [item["month"] for item in revenue_data]
-    revenue_amounts = [item["revenue"] for item in revenue_data]
+    # revenue_months = [item["month"] for item in revenue_data]
+    # revenue_amounts = [item["revenue"] for item in revenue_data]
+
+
+    specialty_labels = [item["specialty"] for item in specialty_data] if specialty_data else []
+    specialty_counts = [item["count"] for item in specialty_data] if specialty_data else []
+    revenue_months = [item["month"] for item in revenue_data] if revenue_data else []
+    revenue_amounts = [float(item["revenue"]) for item in revenue_data] if revenue_data else []
     
     return render_template(
         "dashboard.html",
@@ -39,10 +51,14 @@ def dashboard():
         stats=stats,
         recent_activities=recent_activities,
         upcoming_appointments=upcoming_appointments,
-        specialty_labels=json.dumps(specialty_labels),
-        specialty_counts=json.dumps(specialty_counts),
-        revenue_months=json.dumps(revenue_months),
-        revenue_amounts=json.dumps(revenue_amounts)
+        # specialty_labels=json.dumps(specialty_labels),
+        # specialty_counts=json.dumps(specialty_counts),
+        # revenue_months=json.dumps(revenue_months),
+        # revenue_amounts=json.dumps(revenue_amounts)
+        specialty_labels=specialty_labels,        # ← Real data from DB
+        specialty_counts=specialty_counts,        # ← Real data from DB
+        revenue_months=revenue_months,            # ← Real data from DB
+        revenue_amounts=revenue_amounts
     )
 
 @dashboard_bp.route("/api/dashboard/stats")
@@ -111,7 +127,7 @@ def get_upcoming_appointments():
     
     return jsonify(appointments_data)
 # In controllers/dashboard_controller.py
-@dashboard_bp.route("/dashboard")
-def dashboard():
+@dashboard_bp.route("/to_doctors")
+def dashboard_to_doctors():
     """Redirect to doctors page"""
     return redirect("/doctors")

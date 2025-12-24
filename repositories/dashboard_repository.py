@@ -1,5 +1,5 @@
 # repositories/dashboard_repository.py
-from db_singleton import DatabaseConnection
+from core.db_singleton import DatabaseConnection
 from models.dashboard import DashboardStats, RecentActivity, AppointmentSummary
 from datetime import datetime, date
 import pyodbc

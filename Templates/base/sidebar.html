@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/pharmacy.css') }}">
 <aside class="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">Rx</div>
@@ -11,7 +12,7 @@
     <ul class="nav-list">
         <!-- DASHBOARD (Common) -->
         <li class="nav-item">
-            <a class="nav-link" href="/dashboard">
+            <a class="nav-link" href="{{ url_for('dashboard.dashboard') }}">
                 <span class="icon">🏠</span>
                 Dashboard
             </a>
@@ -27,7 +28,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/admin/patients">
+                <a class="nav-link" href="/doctors">
                     <span class="icon">👨‍⚕️</span>
                     Doctors
                 </a>
@@ -36,6 +37,12 @@
                 <a class="nav-link" href="/appointments">
                     <span class="icon">👥</span>
                     All Appointments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/medicine-stock">
+                    <span class="icon">💊</span>
+                    Medicine Stock
                 </a>
             </li>
 

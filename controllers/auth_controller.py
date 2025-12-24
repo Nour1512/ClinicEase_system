@@ -104,21 +104,23 @@ def signup():
 
 
 
-@auth_bp.route("/dashboard")
-def dashboard():
-    if "user_id" not in session:
-        return redirect("/login")
+# deeh 2et8ayarettttttttttttt
+
+# @auth_bp.route("/dashboard")
+# def dashboard():
+#     if "user_id" not in session:
+#         return redirect("/login")
     
-    role = session.get("role")
-    if role == "patient":
-        return redirect("/pharmacy")
-    elif role == "doctor":
-        # return render_template("user/doctor/doctors.html", name=session["name"])
-        return redirect("/patients")
-    elif role == "admin":
-        return redirect("/admin/patients")      # 7ateet patients page badal dashboard
-    else:
-        return redirect("/login")
+#     role = session.get("role")
+#     if role == "patient":
+#         return redirect("/pharmacy")
+#     elif role == "doctor":
+#         # return render_template("user/doctor/doctors.html", name=session["name"])
+#         return redirect("/patients")
+#     elif role == "admin":
+#         return redirect("/admin/patients")      # 7ateet patients page badal dashboard
+#     else:
+#         return redirect("/login")
 
 
 

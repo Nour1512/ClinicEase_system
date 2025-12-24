@@ -1,11 +1,13 @@
-from core.db_singleton import db
+from core.db_singleton import DatabaseConnection
  # Singleton DatabaseConnection
 from models.ms import Medicine
 
 class MedicineStockRepository:
+    def __init__(self):
+        self.db = DatabaseConnection()
 
     def get_all(self):
-        conn = db.get_connection()
+        conn = self.db.get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM medicines ORDER BY id DESC")
         columns = [column[0] for column in cursor.description]
@@ -16,7 +18,7 @@ class MedicineStockRepository:
         return data
 
     def search(self, query):
-        conn = db.get_connection()
+        conn = self.db.get_connection()
         cursor = conn.cursor()
         q = f"%{query}%"
         cursor.execute("""
@@ -31,7 +33,7 @@ class MedicineStockRepository:
         return data
 
     def create(self, data):
-        conn = db.get_connection()
+        conn = self.db.get_connection()
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO medicines
@@ -52,7 +54,7 @@ class MedicineStockRepository:
         return Medicine.from_dict({**data, 'id': medicine_id})
 
     def update(self, medicine_id, data):
-        conn = db.get_connection()
+        conn = self.db.get_connection()
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE medicines SET
@@ -75,7 +77,7 @@ class MedicineStockRepository:
         return Medicine.from_dict({**data, 'id': medicine_id})
 
     def delete(self, medicine_id):
-        conn = db.get_connection()
+        conn = self.db.get_connection()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM medicines WHERE id=?", (medicine_id,))
         conn.commit()

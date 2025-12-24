@@ -12,7 +12,7 @@ repo = MedicineStockRepository()
 
 @ms_blueprint.route('/')
 def page():
-    return render_template('medcine_stock/ms.html')
+    return render_template('ms_html/index.html')
 
 
 @ms_blueprint.route('/api/medicines', methods=['GET'])

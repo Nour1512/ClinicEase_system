@@ -62,7 +62,7 @@ function setupEventListeners() {
     // Action buttons
     document.querySelectorAll('.btn-action').forEach(btn => {
         btn.addEventListener('click', function(e) {
-            e.stopPropagation();
+            // e.stopPropagation();
             const action = this.classList.contains('view-btn') ? 'view' : 
                           this.classList.contains('edit-btn') ? 'edit' : 'delete';
             handleAction(action, this);

@@ -134,7 +134,13 @@ def datetimeformat(value):
 from controllers.bookApp_controller import bookApp_bp
 
 # Register with proper URL prefix
+
+from controllers.dashboard_controller import dashboard_bp
+app.register_blueprint(dashboard_bp)
 app.register_blueprint(bookApp_bp, url_prefix='/book')
+
+from controllers.ms_controller import ms_blueprint
+app.register_blueprint(ms_blueprint)
 
 
 from controllers.profile_completion_controller import get_missing_profile_fields

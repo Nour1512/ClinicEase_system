@@ -12,7 +12,7 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <!-- <aside class="sidebar">
             <div class="sidebar-header">
                 <h2><i class="fas fa-hospital-alt"></i> ClinicEase</h2>
                 <p>Medical Management System</p>
@@ -118,7 +118,9 @@
                     <small>Updated just now</small>
                 </div>
             </div>
-        </aside>
+        </aside> -->
+
+        {% include 'base/sidebar.html' %}
         
         <!-- Main Content -->
         <main class="main-content">
@@ -381,10 +383,15 @@
     <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
     <script>
         // Initialize charts with data from Flask
-        const specialtyLabels = {{ specialty_labels|safe }};
-        const specialtyCounts = {{ specialty_counts|safe }};
-        const revenueMonths = {{ revenue_months|safe }};
-        const revenueAmounts = {{ revenue_amounts|safe }};
+        // const specialtyLabels = {{ specialty_labels|safe }};
+        // const specialtyCounts = {{ specialty_counts|safe }};
+        // const revenueMonths = {{ revenue_months|safe }};
+        // const revenueAmounts = {{ revenue_amounts|safe }};
+
+        const specialtyLabels = {{ specialty_labels | safe if specialty_labels else '[]' }};
+        const specialtyCounts = {{ specialty_counts | safe if specialty_counts else '[]' }};
+        const revenueMonths = {{ revenue_months | safe if revenue_months else '[]' }};
+        const revenueAmounts = {{ revenue_amounts | safe if revenue_amounts else '[]' }};
     </script>
 </body>
 </html>

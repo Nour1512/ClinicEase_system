@@ -6,12 +6,12 @@
     <title>Medicine Stock Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/ms.css">
+    <link rel="stylesheet" href="/static/styles/ms.css">
 </head>
 <body>
     <div class="app-shell">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <!-- <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">M</div>
                 <div>
@@ -60,38 +60,20 @@
                 </li>
             </ul>
 
-            <!-- <div class="sidebar-section-title">Reports</div>
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="icon"><i class="fas fa-clipboard-list"></i></span>
-                        <span class="text">Stock Report</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="icon"><i class="fas fa-dollar-sign"></i></span>
-                        <span class="text">Sales Report</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="icon"><i class="fas fa-calendar-times"></i></span>
-                        <span class="text">Expiry Report</span>
-                    </a>
-                </li>
-            </ul> -->
+            
 
             <div class="sidebar-footer">
                 <div>© 2024 <strong>MediStore Pro</strong></div>
                 <div>v2.1.0 • Pharmacy Edition</div>
             </div>
-        </aside>
+        </aside> -->
+
+        {% include 'base/sidebar.html' %}
 
         <!-- Main Content -->
         <main class="main">
             <!-- Topbar -->
-            <div class="topbar">
+            <!-- <div class="topbar">
                 <div class="search-wrapper">
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" id="searchInput" class="search-input" placeholder="Search medicines, categories, manufacturers...">
@@ -109,7 +91,42 @@
                     </button>
                     <div class="avatar">JD</div>
                 </div>
-            </div>
+            </div> -->
+
+            <div class="topbar">
+        <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input id="searchInput" class="search-input" type="text"
+                   placeholder="Search medicines by name, ID or supplier..." />
+        </div>
+
+        <div class="topbar-actions">
+            <button class="chip-ai" type="button" id="aiHelperBtn">
+                <span class="icon">⚡</span>
+                <span>AI Assistance</span>
+            </button>
+            <!-- <button class="btn-round" type="button">🔔</button> -->
+            <a href="{{ url_for('notifications.notifications_page') }}" 
+                class="btn-round notification-bell" 
+                style="text-decoration: none; display: inline-block; border: none; background: transparent; cursor: pointer; padding: 8px; border-radius: 50%; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 1.2rem; color: #f59e0b;">🔔</span>
+            </a>
+
+            {% if missing_profile_fields %}
+                <a href="{{ url_for('patients.complete_profile') }}" class="avatar-container">
+                    <div class="avatar">PH</div>
+                    <span class="profile-alert-dot">●</span>
+                </a>
+            {% else %}
+                <div class="avatar-container">
+                    <div class="avatar">PH</div>
+                </div>
+            {% endif %}
+            <!-- <div class="avatar-container">
+                <div class="avatar">PH</div>
+            </div> -->
+        </div>
+    </div>
 
             <!-- Page Header -->
             <div class="page-header">
@@ -323,7 +340,12 @@
 
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
+        <script>
+        document.getElementById("aiHelperBtn").addEventListener("click", function() {
+            window.location.href = "/chatbot-page";
+        });
+    </script>
 
-    <script src="/static/js/ms.js"></script>
+    <script src="/static/scripts/ms.js"></script>
 </body>
 </html>
