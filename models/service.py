@@ -12,7 +12,7 @@ class Service:
             "service_id": self.service_id,
             "service_name": self.service_name,
             "department": self.department,
-            "price": float(self.price),
+            "price": float(self.price) if self.price is not None else 0.0,
             "status": self.status,
             "created_at": str(self.created_at) if self.created_at else None
         }

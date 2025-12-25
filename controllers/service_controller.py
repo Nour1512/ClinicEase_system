@@ -1,45 +1,71 @@
 from flask import Blueprint, render_template, request, jsonify
 from repositories.service_repository import ServiceRepository
 
-service_bp = Blueprint('service', __name__, url_prefix='/service')
+# ✅ THIS LINE FIXES EVERYTHING
+service_bp = Blueprint("service",__name__,url_prefix="/service")
+
 repo = ServiceRepository()
 
 # ---------- PAGE ----------
-@service_bp.route('/')
+@service_bp.route("/")
 def services_page():
-    services = repo.get_all_services()
-    total = repo.get_total_services()
-    return render_template(
-        'service/service.html',
-        services=services,
-        total_services=total
-    )
+    try:
+        services = repo.get_all_services()
+        total = len(services)
+        return render_template(
+            "service/service.html",
+            services=services,
+            total_services=total
+        )
+    except Exception as e:
+        print(f"❌ PAGE ERROR: {e}")
+        return "<h2>Service Page Error</h2>", 500
 
-# ---------- APIs ----------
-@service_bp.route('/api/get', methods=['GET'])
+
+# ---------- API ----------
+@service_bp.route("/api/get", methods=["GET"])
 def get_services():
-    services = repo.get_all_services()
-    return jsonify([s.to_dict() for s in services])
+    try:
+        services = repo.get_all_services()
+        return jsonify([s.to_dict() for s in services])
+    except Exception as e:
+        print(f"❌ GET ERROR: {e}")
+        return jsonify({"error": str(e)}), 500
 
-@service_bp.route('/api/add', methods=['POST'])
+
+@service_bp.route("/api/add", methods=["POST"])
 def add_service():
-    data = request.json
-    repo.add_service(data)
-    return jsonify({'message': 'Service added successfully'})
+    try:
+        data = request.get_json()
+        print("📥 ADD SERVICE DATA:", data)
 
-@service_bp.route('/api/update', methods=['PUT'])
+        repo.add_service(data)
+
+        return jsonify({
+            "success": True,
+            "message": "Service added successfully"
+        }), 201
+    except Exception as e:
+        print(f"❌ ADD ERROR: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@service_bp.route("/api/update", methods=["PUT"])
 def update_service():
-    data = request.json
-    repo.update_service(data)
-    return jsonify({'message': 'Service updated successfully'})
+    try:
+        data = request.get_json()
+        repo.update_service(data)
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print(f"❌ UPDATE ERROR: {e}")
+        return jsonify({"error": str(e)}), 500
 
-@service_bp.route('/api/delete/<int:service_id>', methods=['DELETE'])
-def delete_service(service_id):
-    repo.delete_service(service_id)
-    return jsonify({'message': 'Service deleted successfully'})
 
-@service_bp.route('/api/search', methods=['GET'])
-def search_services():
-    keyword = request.args.get('q', '')
-    services = repo.search_services(keyword)
-    return jsonify([s.to_dict() for s in services])
+@service_bp.route("/api/delete/<int:id>", methods=["DELETE"])
+def delete_service(id):
+    try:
+        repo.delete_service(id)
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print(f"❌ DELETE ERROR: {e}")
+        return jsonify({"error": str(e)}), 500
