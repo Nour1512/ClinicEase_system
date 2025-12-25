@@ -21,7 +21,6 @@ from flask import Flask, redirect , session
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import os
-from controllers.invoice_details_controller import InvoiceController
 from controllers.service_controller import service_bp
 # from controllers.invoice_controller import invoice_bp
 from authlib.integrations.flask_client import OAuth
