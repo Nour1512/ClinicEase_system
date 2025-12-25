@@ -21,7 +21,7 @@ from flask import Flask, redirect , session
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import os
-from controllers.invoice_controller import InvoiceController
+from controllers.invoice_details_controller import InvoiceController
 from controllers.service_controller import service_bp
 # from controllers.invoice_controller import invoice_bp
 from authlib.integrations.flask_client import OAuth
@@ -103,7 +103,7 @@ app.register_blueprint(payment_bp, url_prefix='/')  # Add url_prefix if needed
 app.register_blueprint(service_bp , url_prefix='/services')
 from controllers.chatbot_controller import chatbot_bp
 app.register_blueprint(chatbot_bp)
-from controllers.invoice_controller import invoice_bp
+from controllers.invoice_details_controller import invoice_bp
 app.register_blueprint(invoice_bp)
 # from controllers.service_controller import service_bp
 # app.register_blueprint(service_bp)

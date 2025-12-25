@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <title>Invoice {{ invoice.invoice_number }} - Clinic Ease</title> -->
+    <title>Invoice details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/invoice_details.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        {% include 'base/sidebar.html' %}
+
+        <main class="main">
+            <div class="topbar">
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" placeholder="Search...">
+                </div>
+                <div class="topbar-actions" style="display:flex; gap:15px; align-items:center;">
+                    <div class="avatar" style="background:var(--primary); color:white; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                        {{ invoice.client_name[0] if invoice.client_name else 'U' }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h1 style="font-size: 24px;">Invoice Details</h1>
+                    <p style="color:var(--text-muted); font-size:14px;">Invoices / {{ invoice.invoice_number }}</p>
+                </div>
+                <div class="actions">
+                    <button class="btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                </div>
+            </div>
+
+            <div class="invoice-details-card">
+                <div class="invoice-header">
+                    <div>
+                        <h2>Clinic Ease</h2>
+                        <!-- <p>Complete health screening services</p> -->
+                        <span class="badge" style="background: #e0e7ff; color: #4338ca; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase;">
+                            {{ invoice.status }}
+                        </span>
+                    </div>
+                    <div class="text-right">
+                        <div class="invoice-number">#{{ invoice.invoice_number }}</div>
+                        <p>Issued: {{ invoice.issued_date }}</p>
+                    </div>
+                </div>
+
+                <div class="invoice-content">
+                    <div class="left-col">
+                        <div class="address-grid">
+                            <div class="address-card">
+                                <h4>Invoice To</h4>
+                                <strong>{{ invoice.client_name }}</strong><br>
+                                {{ invoice.address if invoice.address else "No address provided" }}
+                            </div>
+                            <div class="address-card">
+                                <h4>Shipping To</h4>
+                                <strong>{{ invoice.client_name }}</strong><br>
+                                {{ invoice.address if invoice.address else "No address provided" }}
+                            </div>
+                        </div>
+
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Description</th>
+                                    <th class="text-right">Qty</th>
+                                    <th class="text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Clinic Service</td>
+                                    <td>Consultation and Medical Services</td>
+                                    <td class="text-right">1</td>
+                                    <td class="text-right">${{ "{:,.2f}".format(invoice.amount) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="right-col">
+                        <div class="summary-card">
+                            <h4>Summary</h4>
+                            <div class="summary-row">
+                                <span>Subtotal</span>
+                                <span>${{ "{:,.2f}".format(invoice.amount) }}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Tax (0%)</span>
+                                <span>$0.00</span>
+                            </div>
+                            <hr style="border: none; border-top: 1px solid var(--border-soft); margin: 10px 0;">
+                            <div class="summary-row total" style="font-weight: 800; color: var(--primary); font-size: 1.2rem;">
+                                <strong>Total</strong>
+                                <strong>${{ "{:,.2f}".format(invoice.amount) }}</strong>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <h4>Payment Info</h4>
+                            <p style="font-size:13px; color:var(--text-muted);">
+                                Status: <strong>{{ invoice.status }}</strong><br>
+                                Method: Check/Bank Transfer
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
