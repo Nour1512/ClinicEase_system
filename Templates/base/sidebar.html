@@ -51,14 +51,7 @@
                     Feedback
                 </a>
             </li>
-            {% if patient_id %}
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('patients_details.patient_details_page', patient_id=patient_id) }}">
-                    <span class="icon">📝</span>
-                    Patient Details
-                </a>
-            </li>
-            {% endif %}
+
 
         {% elif current_role == "doctor" %}
             <!-- Doctor sees "My Patients" as main page -->
@@ -115,11 +108,19 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/doctors">
+                <a class="nav-link" href="/patient_feedbacks/patient-feedback">
                     <span class="icon">✍️</span>
                     Feedback
                 </a>
             </li>
+            {% if patient_id %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('patients_details.patient_details_page', patient_id=patient_id) }}">
+                    <span class="icon">📝</span>
+                    Patient Details
+                </a>
+            </li>
+            {% endif %}
         {% endif %}
 
         <!-- Profile Completion (Patient Only) -->

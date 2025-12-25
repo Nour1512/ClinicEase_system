@@ -117,6 +117,9 @@ app.register_blueprint(notification_bp)
 app.register_blueprint(admin_feedback_bp, url_prefix='/admin_feedbacks')
 app.register_blueprint(doctor_bp)
 
+from controllers.p_feedback_controller import patient_feedback_bp
+app.register_blueprint(patient_feedback_bp, url_prefix='/patient_feedbacks')
+
 
 from controllers.appointment_controller import appointment_bp
 
