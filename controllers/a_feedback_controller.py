@@ -1,61 +1,44 @@
-# controller/a_feedback_controller.py
-
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, jsonify, request, render_template
 from repositories.a_feedback_repositry import AdminFeedbackRepository
-from models.a_feedback import AdminFeedback
 
 
-feedback_bp = Blueprint('feedback', __name__, template_folder='../templates')
+admin_feedback_bp = Blueprint('admin_feedback_bp', __name__)
+
+repo = AdminFeedbackRepository()
+
+@admin_feedback_bp.route('/admin-feedback')
+def admin_feedback_page():
+   
+    return render_template('a_feedback/a_feedback.html')
 
 
-@feedback_bp.route('/', methods=['GET'])
-def list_feedback():
- 
-    status_filter = request.args.get('status', 'all')  # all, pending, approved, spam, trash
-    type_filter = request.args.get('type', 'all_types')
-    rating_filter = request.args.get('rating', 'all_ratings')
-    search_query = request.args.get('search', '')
 
-    
-    repo = AdminFeedbackRepository()
-    feedback_list = repo.get_all_feedback(
-        status=status_filter,
-        feedback_type=type_filter,
-        rating=rating_filter,
-        search_term=search_query
+@admin_feedback_bp.route('/api/admin/feedback', methods=['GET'])
+@admin_feedback_bp.route('/api/admin/feedback/', methods=['GET'])
+def get_feedback_api():
+   
+    try:
+        data = repo.get_all_feedback()
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@admin_feedback_bp.route('/api/admin/feedback/update', methods=['POST'])
+@admin_feedback_bp.route('/api/admin/feedback/update/', methods=['POST'])
+def update_feedback_api():
+
+    data = request.json
+    if not data or 'Id' not in data:
+        return jsonify({"success": False, "message": "Missing ID"}), 400
+
+    success = repo.update_feedback(
+        f_id=data['Id'],
+        admin=data.get('AdminName', 'Admin'),
+        comments=data.get('Comments', ''),
+        status=data.get('Status', 'pending')
     )
 
-    
-    context = {
-        'feedback_list': feedback_list,
-        'total_count': len(feedback_list),
-        'current_status': status_filter,
-        'current_type': type_filter,
-        'current_rating': rating_filter,
-        'search_query': search_query,
-        'page_title': 'Admin Feedback',
-        'active_nav': 'feedback'  
-    }
-
-    return render_template('a_feedback/a_feedback.html', **context)
-
-
-@feedback_bp.route('/delete/<int:feedback_id>', methods=['POST'])
-def delete_feedback(feedback_id):
-    repo = AdminFeedbackRepository()
-    success = repo.delete_feedback(feedback_id)
     if success:
-        return jsonify({'success': True, 'message': 'Feedback deleted successfully'})
+        return jsonify({"success": True, "message": "Updated successfully"}), 200
     else:
-        return jsonify({'success': False, 'message': 'Failed to delete feedback'})
-
-@feedback_bp.route('/update-status/<int:feedback_id>', methods=['POST'])
-def update_feedback_status(feedback_id):
-    new_status = request.form.get('status')
-    repo = AdminFeedbackRepository()
-    success = repo.update_feedback_status(feedback_id, new_status)
-    if success:
-        return jsonify({'success': True, 'message': f'Status updated to {new_status}'})
-    else:
-        return jsonify({'success': False, 'message': 'Failed to update status'})
-
+        return jsonify({"success": False, "message": "Database update failed"}), 500
