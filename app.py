@@ -110,12 +110,12 @@ app.register_blueprint(invoice_bp)
 from controllers.patient_controller import patients_bp
 app.register_blueprint(patients_bp)
 
-from controllers.admin_controller import admin_bp
+from controllers.admin_controller import admin_feedback_bp
 from controllers.doctor_controller import doctor_bp
 from controllers.notifications_controller import notification_bp
 app.register_blueprint(notification_bp)
 
-app.register_blueprint(admin_bp, url_prefix='/admin')
+app.register_blueprint(admin_feedback_bp, url_prefix='/admin')
 app.register_blueprint(doctor_bp)
 
 from controllers.appointment_controller import appointment_bp
@@ -141,6 +141,9 @@ app.register_blueprint(bookApp_bp, url_prefix='/book')
 
 from controllers.ms_controller import ms_blueprint
 app.register_blueprint(ms_blueprint)
+
+from controllers.patients_details_controller import patients_details_bp
+app.register_blueprint(patients_details_bp, url_prefix='/patients_details')
 
 
 from controllers.profile_completion_controller import get_missing_profile_fields

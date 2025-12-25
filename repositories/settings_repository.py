@@ -66,6 +66,12 @@ class SettingsRepository:
             db.commit()
         except Exception as e:
             print(f"Database error in change_email: {e}")
+        finally:
+            if cursor:
+                cursor.close()
+            if db:
+                db.close()
+
     def get_by_id(self, user_id):
         db = None
         cursor = None

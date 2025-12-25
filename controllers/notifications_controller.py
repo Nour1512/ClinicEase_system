@@ -10,7 +10,8 @@ repo = NotificationRepository()
 @notification_bp.route("/notifications")
 def notifications_page():
     if "user_id" not in session:
-        return render_template("errors/403.html")
+        # return render_template("errors/403.html")
+        return "Access Denied", 403
 
     user_id = session["user_id"]
     role = session["role"]

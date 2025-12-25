@@ -98,9 +98,9 @@ def add_patient_details(patient_id):
                     url_for("patients_details.patient_details_page", patient_id=patient_id)
                 )
 
-        from models.patient_details import PatientDetails
+        from models.patient_details import patient_details
 
-        patient = PatientDetails(
+        patient = patient_details(
             patient_id=patient_id,
             blood_type=request.form["blood_type"],
             height_cm=float(request.form["height_cm"]),

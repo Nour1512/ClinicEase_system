@@ -1,44 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Enter Verification Code</title>
-    <link rel="stylesheet" href="/static/styles/verification_code.css" />
-</head>
-<body>
-    <div class="modal">
-        <button class="close-btn">&times;</button>
-        <h1>Enter Verification Code</h1>
-        <p>We have sent a verification code to your email</p>
-
-
-        <div class="otp-inputs">
-            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-            <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
-        </div>
-
-        <button class="verify-btn">Verify</button>
-        <span class="resend">Resend verification code</span>
-    </div>
-    <script src="/static/scripts/verification_code.js"></script>
-</body>
-</html> -->
-
-
-
-
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,20 +9,20 @@
 <body>
     <form method="POST" action="/verify-reset-code">
         <div class="modal">
-            <!-- Remove the close button OR keep it as a cancel link -->
+
             <a href="/forgot-password" class="close-btn">&times;</a>
 
             <h1>Enter Verification Code</h1>
             <p>We have sent a verification code to your email</p>
 
-            <!-- Hidden input for email (if needed) -->
+
             
             <input type="hidden" name="email" value="{{ email }}">
             <input type="hidden" name="code" id="full-code">
 
-            <!-- OTP Input Fields -->
+
             <div class="otp-inputs">
-                <!-- Keep your 6 inputs, but give them a name -->
+
                 <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
                 <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
                 <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" />
