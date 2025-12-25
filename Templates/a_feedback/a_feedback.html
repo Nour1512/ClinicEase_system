@@ -1,362 +1,261 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Feedback</title>
+    <title>Admin - Patient Feedback</title>
     <link rel="stylesheet" href="/static/css/a_feedback.css">
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-    </style>
+   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="app-shell">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo">A</div>
+                <div class="sidebar-logo">H</div>
                 <div>
-                    <h1 class="sidebar-title">Admin Panel</h1>
-                    <p class="sidebar-subtitle">Feedback Management</p>
+                    <div class="sidebar-title">Clinic Ease</div>
+                    <div class="sidebar-subtitle">Admin Dashboard</div>
                 </div>
             </div>
-
-            <div class="sidebar-section-title">Main</div>
+            
+            <div class="sidebar-section-title">Main Menu</div>
             <ul class="nav-list">
                 <li class="nav-item">
-                    <a href="#" class="nav-link active">
-                        <span class="icon">📊</span>
+                    <a href="admin_dashboard.html" class="nav-link">
+                        <span class="icon"><i class="fas fa-tachometer-alt"></i></span>
                         Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="icon">⭐</span>
-                        Reviews
+                    <a href="admin_feedback.html" class="nav-link active">
+                        <span class="icon"><i class="fas fa-comment-medical"></i></span>
+                        Patient Feedback
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="icon">📦</span>
-                        Products
+                    <a href="admin_patients.html" class="nav-link">
+                        <span class="icon"><i class="fas fa-user-injured"></i></span>
+                        Patients
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="icon">👤</span>
-                        Users
+                    <a href="admin_reports.html" class="nav-link">
+                        <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                        Reports
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="admin_settings.html" class="nav-link">
+                        <span class="icon"><i class="fas fa-cog"></i></span>
+                        Settings
                     </a>
                 </li>
             </ul>
-
-            <div class="sidebar-section-title">Settings</div>
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="icon">⚙️</span>
-                        General
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="icon">🔒</span>
-                        Security
-                    </a>
-                </li>
-            </ul>
-
+            
+            <div class="sidebar-section-title">Quick Stats</div>
+            <div class="sidebar-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalReviews">108</div>
+                    <div class="stat-label">All Reviews</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="pendingReviews">108</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="approvedReviews">0</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+            </div>
+            
             <div class="sidebar-footer">
-                Logged in as <strong>Admin</strong>
+                <div>Logged in as <strong>Admin User</strong></div>
+                <div>Role: <strong>Super Administrator</strong></div>
             </div>
         </aside>
-
+        
         <!-- Main Content -->
         <main class="main">
-            <!-- Top Bar -->
+            <!-- Topbar -->
             <div class="topbar">
                 <div class="search-wrapper">
-                    <input type="text" class="search-input" placeholder="Search reviews...">
-                    <span class="search-icon">🔍</span>
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search patients, feedback, or comments...">
                 </div>
+                
                 <div class="topbar-actions">
-                    <button class="btn-round">⚙️</button>
-                    <div class="avatar">A</div>
+                    <button class="btn-round" id="filterBtn" title="Filter Options">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                    <button class="btn-round" id="refreshBtn" title="Refresh Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <div class="avatar">AU</div>
                 </div>
             </div>
-
+            
             <!-- Page Header -->
             <div class="page-header">
                 <div class="page-header-left">
-                    <h1>Feedback</h1>
+                    <h1>Patient Feedback Reviews</h1>
                     <div class="breadcrumb">
-                        <a href="#">Dashboard</a>
+                        <a href="admin_dashboard.html">Dashboard</a>
                         <span class="separator">/</span>
-                        <span>Feedback</span>
+                        <span>Patient Feedback</span>
                     </div>
                 </div>
+                
                 <div class="page-header-right">
-                    <button class="btn-primary">
-                        <span class="icon">➕</span>
-                        Add New
+                    <button class="btn-primary" id="bulkActionsBtn">
+                        <i class="fas fa-tasks"></i>
+                        Bulk Actions
+                    </button>
+                    <button class="btn-secondary" id="exportAllBtn">
+                        <i class="fas fa-download"></i>
+                        Export All
                     </button>
                 </div>
             </div>
-
-            <!-- Filters & Actions -->
-            <div class="feedback-controls">
-                <div class="filter-group">
-                    <select class="filter-select">
-                        <option value="all">All (108)</option>
-                        <option value="pending">Pending (108)</option>
-                        <option value="approved">Approved (0)</option>
-                        <option value="spam">Spam (0)</option>
-                        <option value="trash">Trash (0)</option>
-                    </select>
-                    <select class="filter-select">
-                        <option value="all_types">All types</option>
-                        <option value="review">Review</option>
-                        <option value="comment">Comment</option>
-                    </select>
-                    <select class="filter-select">
-                        <option value="all_ratings">All ratings</option>
-                        <option value="5">5 Stars</option>
-                        <option value="4">4 Stars</option>
-                        <option value="3">3 Stars</option>
-                        <option value="2">2 Stars</option>
-                        <option value="1">1 Star</option>
-                    </select>
-                    <input type="text" class="filter-search" placeholder="Search for a product...">
-                    <button class="btn-secondary">Filter</button>
+            
+            <!-- Reviews Filters -->
+            <div class="reviews-filters">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">
+                        All <span class="filter-count">108</span>
+                    </button>
+                    <button class="filter-tab" data-filter="pending">
+                        Pending <span class="filter-count">108</span>
+                    </button>
+                    <button class="filter-tab" data-filter="approved">
+                        Approved <span class="filter-count">0</span>
+                    </button>
+                    <button class="filter-tab" data-filter="spam">
+                        Spam <span class="filter-count">0</span>
+                    </button>
+                    <button class="filter-tab" data-filter="trash">
+                        Trash <span class="filter-count">0</span>
+                    </button>
                 </div>
-                <div class="bulk-actions">
-                    <select class="filter-select">
-                        <option>Bulk actions</option>
-                        <option>Approve selected</option>
-                        <option>Mark as spam</option>
-                        <option>Delete permanently</option>
-                    </select>
-                    <button class="btn-secondary">Apply</button>
-                </div>
-            </div>
-
-            <!-- Feedback Table -->
-            <div class="feedback-table-container">
-                <div class="table-header">
-                    <div class="table-row">
-                        <div class="table-cell checkbox-cell">
-                            <input type="checkbox" id="select-all">
-                            <label for="select-all"></label>
-                        </div>
-                        <div class="table-cell sort-header">
-                            Type
-                            <span class="sort-arrow">↑↓</span>
-                        </div>
-                        <div class="table-cell sort-header">
-                            Author
-                            <span class="sort-arrow">↑↓</span>
-                        </div>
-                        <div class="table-cell sort-header">
-                            Rating
-                            <span class="sort-arrow">↑↓</span>
-                        </div>
-                        <div class="table-cell sort-header">
-                            Review
-                            <span class="sort-arrow">↑↓</span>
-                        </div>
-                        <div class="table-cell sort-header">
-                            Product
-                            <span class="sort-arrow">↑↓</span>
-                        </div>
-                        <div class="table-cell sort-header">
-                            Submitted on
-                            <span class="sort-arrow">↑↓</span>
-                        </div>
+                
+                <div class="filter-controls">
+                    <div class="bulk-actions-controls">
+                        <select class="select-control" id="bulkActionSelect">
+                            <option value="">Bulk actions</option>
+                            <option value="approve">Approve</option>
+                            <option value="pending">Mark as Pending</option>
+                            <option value="spam">Mark as Spam</option>
+                            <option value="trash">Move to Trash</option>
+                            <option value="delete">Delete Permanently</option>
+                        </select>
+                        <button class="btn-small" id="applyBulkActionBtn">Apply</button>
                     </div>
-                </div>
-                <div class="table-body">
-                    <!-- Row 1 -->
-                    <div class="table-row">
-                        <div class="table-cell checkbox-cell">
-                            <input type="checkbox" id="row-1">
-                            <label for="row-1"></label>
-                        </div>
-                        <div class="table-cell">
-                            <span class="badge badge-review">Review</span>
-                        </div>
-                        <div class="table-cell author-cell">
-                            <div class="author-info">
-                                <div class="avatar-sm">C</div>
-                                <div>
-                                    <div class="author-name">Carlos J.</div>
-                                    <div class="author-email">carlosj@gmail.com</div>
-                                    <div class="author-ip">49.207.218.36</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-cell rating-cell">
-                            <div class="rating-stars">
-                                <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
-                            </div>
-                        </div>
-                        <div class="table-cell review-text">
-                            Great display, but the headset is a bit heavy. Still a big step up from my previous VR headset.
-                        </div>
-                        <div class="table-cell product-cell">
-                            <div class="product-info">
-                                <div class="product-name">HTC Vive Pro 2</div>
-                                <div class="product-action"><a href="#">View product</a></div>
-                                <div class="comment-count">💬 <span class="count">0</span> <span class="count-badge">4</span></div>
-                            </div>
-                        </div>
-                        <div class="table-cell date-cell">
-                            2025/11/04 at 10:33 am
-                        </div>
-                    </div>
-
-                    <!-- Row 2 -->
-                    <div class="table-row">
-                        <div class="table-cell checkbox-cell">
-                            <input type="checkbox" id="row-2">
-                            <label for="row-2"></label>
-                        </div>
-                        <div class="table-cell">
-                            <span class="badge badge-review">Review</span>
-                        </div>
-                        <div class="table-cell author-cell">
-                            <div class="author-info">
-                                <div class="avatar-sm">L</div>
-                                <div>
-                                    <div class="author-name">Lena M.</div>
-                                    <div class="author-email">lenamenon@gmail.com</div>
-                                    <div class="author-ip">49.207.218.36</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-cell rating-cell">
-                            <div class="rating-stars">
-                                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                            </div>
-                        </div>
-                        <div class="table-cell review-text">
-                            Perfect for Racing & Flight Sims. Perfect for sim racing and flight sims. Colors are vivid and text is crisp even at close range.
-                        </div>
-                        <div class="table-cell product-cell">
-                            <div class="product-info">
-                                <div class="product-name">HTC Vive Pro 2</div>
-                                <div class="product-action"><a href="#">View product</a></div>
-                                <div class="comment-count">💬 <span class="count">0</span> <span class="count-badge">4</span></div>
-                            </div>
-                        </div>
-                        <div class="table-cell date-cell">
-                            2025/11/04 at 10:32 am
-                        </div>
-                    </div>
-
-                    <!-- Row 3 -->
-                    <div class="table-row">
-                        <div class="table-cell checkbox-cell">
-                            <input type="checkbox" id="row-3">
-                            <label for="row-3"></label>
-                        </div>
-                        <div class="table-cell">
-                            <span class="badge badge-review">Review</span>
-                        </div>
-                        <div class="table-cell author-cell">
-                            <div class="author-info">
-                                <div class="avatar-sm">D</div>
-                                <div>
-                                    <div class="author-name">Dev Patel</div>
-                                    <div class="author-email">devpatel91@gmail.com</div>
-                                    <div class="author-ip">49.207.218.36</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-cell rating-cell">
-                            <div class="rating-stars">
-                                <span>★</span><span>★</span><span>★</span><span>★</span><span>☆</span>
-                            </div>
-                        </div>
-                        <div class="table-cell review-text">
-                            Comfort is good for long sessions and the resolution is superb. Would love slightly better audio out of the box.
-                        </div>
-                        <div class="table-cell product-cell">
-                            <div class="product-info">
-                                <div class="product-name">HTC Vive Pro 2</div>
-                                <div class="product-action"><a href="#">View product</a></div>
-                                <div class="comment-count">💬 <span class="count">0</span> <span class="count-badge">4</span></div>
-                            </div>
-                        </div>
-                        <div class="table-cell date-cell">
-                            2025/11/04 at 10:31 am
-                        </div>
-                    </div>
-
-                    <!-- Row 4 -->
-                    <div class="table-row">
-                        <div class="table-cell checkbox-cell">
-                            <input type="checkbox" id="row-4">
-                            <label for="row-4"></label>
-                        </div>
-                        <div class="table-cell">
-                            <span class="badge badge-review">Review</span>
-                        </div>
-                        <div class="table-cell author-cell">
-                            <div class="author-info">
-                                <div class="avatar-sm">A</div>
-                                <div>
-                                    <div class="author-name">Asha R.</div>
-                                    <div class="author-email">ashr@gmail.com</div>
-                                    <div class="author-ip">49.207.218.36</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-cell rating-cell">
-                            <div class="rating-stars">
-                                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                            </div>
-                        </div>
-                        <div class="table-cell review-text">
-                            Incredible Visuals and Immersion. Image clarity and tracking are outstanding. Set up took a little time but the end result is immersive and worth it.
-                        </div>
-                        <div class="table-cell product-cell">
-                            <div class="product-info">
-                                <div class="product-name">HTC Vive Pro 2</div>
-                                <div class="product-action"><a href="#">View product</a></div>
-                                <div class="comment-count">💬 <span class="count">0</span> <span class="count-badge">4</span></div>
-                            </div>
-                        </div>
-                        <div class="table-cell date-cell">
-                            2025/11/04 at 10:31 am
-                        </div>
+                    
+                    <div class="filter-options">
+                        <select class="select-control" id="typeFilter">
+                            <option value="">All types</option>
+                            <option value="positive">Positive (4-5 stars)</option>
+                            <option value="neutral">Neutral (3 stars)</option>
+                            <option value="negative">Negative (1-2 stars)</option>
+                        </select>
+                        
+                        <select class="select-control" id="ratingFilter">
+                            <option value="">All ratings</option>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="2">2 Stars</option>
+                            <option value="1">1 Star</option>
+                        </select>
                     </div>
                 </div>
             </div>
-
+            
+            <!-- Reviews Table -->
+            <div class="reviews-table-container">
+                <div class="table-responsive">
+                    <table class="reviews-table">
+                        <thead>
+                            <tr>
+                                <th width="50">
+                                    <input type="checkbox" id="selectAllCheckbox">
+                                </th>
+                                <th>Patient</th>
+                                <th>Rating</th>
+                                <th>Review</th>
+                                <th>Patient Info</th>
+                                <th>Submitted on</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewsTableBody">
+                            <!-- Reviews will be loaded by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- No Reviews Message -->
+                <div class="empty-state" id="noReviewsMessage" style="display: none;">
+                    <i class="fas fa-comment-slash"></i>
+                    <h3>No reviews found</h3>
+                    <p>Try adjusting your filters or check back later</p>
+                </div>
+            </div>
+            
             <!-- Pagination -->
             <div class="pagination">
-                <div class="pagination-info">
-                    108 items
-                </div>
+                <span class="pagination-info">Showing 1 to 10 of 108 reviews</span>
                 <div class="pagination-controls">
-                    <button class="btn-round">&laquo;</button>
-                    <button class="btn-round">&lt;</button>
-                    <button class="btn-round current-page">1</button>
-                    <button class="btn-round">&gt;</button>
-                    <button class="btn-round">&raquo;</button>
+                    <button class="pagination-btn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <button class="pagination-btn">4</button>
+                    <span class="pagination-ellipsis">...</span>
+                    <button class="pagination-btn">11</button>
+                    <button class="pagination-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
-            </div>
-
-            <!-- Toast Notification (Hidden by default) -->
-            <div class="toast" id="toast-notification">
-                Action completed successfully!
             </div>
         </main>
     </div>
+    
+    <!-- Modal for Review Details -->
+    <div class="modal-overlay" id="reviewModalOverlay">
+        <div class="modal" id="reviewModal">
+            <div class="modal-header">
+                <h3>Review Details</h3>
+                <button class="modal-close" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="reviewModalBody">
+                <!-- Modal content will be loaded by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="closeModalBtn2">Close</button>
+                <button class="btn-primary" id="saveReviewBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+    
+  
 
-    <script src="/static/js/a_feedback.js"></script>
+<script src="/static/js/a_feedback.js"></script>
+
+
+
 </body>
 </html>

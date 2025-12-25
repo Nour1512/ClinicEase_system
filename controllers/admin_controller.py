@@ -1,30 +1,35 @@
-# admin_controller.py
-from flask import Blueprint, render_template , session, redirect, url_for
-from repositories.patient_repository import PatientRepository
-from repositories.doctor_repository import DoctorRepository
-admin_bp = Blueprint("admin", __name__)
+from flask import Blueprint, jsonify, request
+from repositories.a_feedback_repositry import AdminFeedbackRepository
 
-patient_repo = PatientRepository()
-doctor_repo = DoctorRepository()
+admin_feedback_bp = Blueprint(
+    'admin_feedback_bp',
+    __name__,
+    url_prefix='/api/admin'
+)
 
-# @admin_bp.route('/patients')
-# def admin_patients():
-#     patients = patient_repo.get_all_patients()
-#     return render_template('user/admin/patients.html', patients=patients)
+repo = AdminFeedbackRepository()
 
 
+@admin_feedback_bp.route('/feedback', methods=['GET'])
+@admin_feedback_bp.route('/feedback/', methods=['GET'])
+def get_admin_feedback():
+    data = repo.get_all_feedback()
+    return jsonify(data)
 
 
-@admin_bp.route("/patients")
-def patients_list():
-    if session.get("role") != "admin":
-        return redirect(url_for("auth.login"))
-    # Load patients logic here
-    return render_template("user/admin/patients.html", name=session.get("name"))
+@admin_feedback_bp.route('/feedback/update', methods=['POST'])
+@admin_feedback_bp.route('/feedback/update/', methods=['POST'])
+def update_feedback():
+    data = request.json
 
+    repo.update_feedback(
+        data['Id'],
+        data.get('AdminName', 'Admin'),
+        data.get('Comments', ''),
+        data.get('Status', 'pending')
+    )
 
-
-# @admin_bp.route('/doctors')
-# def admin_doctors():
-#     doctors = doctor_repo.get_all_doctors()
-#     return render_template('user/doctor/doctors.html', doctors=doctors)
+    return jsonify({
+        "success": True,
+        "message": "Feedback updated successfully"
+    })
