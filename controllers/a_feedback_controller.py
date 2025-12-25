@@ -13,8 +13,8 @@ def admin_feedback_page():
 
 
 
-@admin_feedback_bp.route('/api/admin/feedback', methods=['GET'])
-@admin_feedback_bp.route('/api/admin/feedback/', methods=['GET'])
+@admin_feedback_bp.route('/api/feedback', methods=['GET'])
+# @admin_feedback_bp.route('/api/admin/feedback/', methods=['GET'])
 def get_feedback_api():
    
     try:
@@ -23,8 +23,8 @@ def get_feedback_api():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@admin_feedback_bp.route('/api/admin/feedback/update', methods=['POST'])
-@admin_feedback_bp.route('/api/admin/feedback/update/', methods=['POST'])
+@admin_feedback_bp.route('/api/feedback/update', methods=['POST'])
+# @admin_feedback_bp.route('/api/admin/feedback/update/', methods=['POST'])
 def update_feedback_api():
 
     data = request.json

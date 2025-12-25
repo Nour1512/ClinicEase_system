@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Patient Feedback</title>
-    <link rel="stylesheet" href="/static/css/a_feedback.css">
+    <link rel="stylesheet" href="/static/styles/a_feedback.css">
    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,70 +15,7 @@
 <body>
     <div class="app-shell">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">H</div>
-                <div>
-                    <div class="sidebar-title">Clinic Ease</div>
-                    <div class="sidebar-subtitle">Admin Dashboard</div>
-                </div>
-            </div>
-            
-            <div class="sidebar-section-title">Main Menu</div>
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a href="admin_dashboard.html" class="nav-link">
-                        <span class="icon"><i class="fas fa-tachometer-alt"></i></span>
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-    <a href="/admin-feedback">Feedback</a>
-        <span class="icon"><i class="fas fa-comment-medical"></i></span>
-        Patient Feedback
-    </a>
-</li>
-                <li class="nav-item">
-                    <a href="admin_patients.html" class="nav-link">
-                        <span class="icon"><i class="fas fa-user-injured"></i></span>
-                        Patients
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="admin_reports.html" class="nav-link">
-                        <span class="icon"><i class="fas fa-chart-bar"></i></span>
-                        Reports
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="admin_settings.html" class="nav-link">
-                        <span class="icon"><i class="fas fa-cog"></i></span>
-                        Settings
-                    </a>
-                </li>
-            </ul>
-            
-            <div class="sidebar-section-title">Quick Stats</div>
-            <div class="sidebar-stats">
-                <div class="stat-item">
-                    <div class="stat-value" id="totalReviews">108</div>
-                    <div class="stat-label">All Reviews</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="pendingReviews">108</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="approvedReviews">0</div>
-                    <div class="stat-label">Approved</div>
-                </div>
-            </div>
-            
-            <div class="sidebar-footer">
-                <div>Logged in as <strong>Admin User</strong></div>
-                <div>Role: <strong>Super Administrator</strong></div>
-            </div>
-        </aside>
+        {% include 'base/sidebar.html' %}
         
         <!-- Main Content -->
         <main class="main">
@@ -90,13 +27,23 @@
                 </div>
                 
                 <div class="topbar-actions">
-                    <button class="btn-round" id="filterBtn" title="Filter Options">
-                        <i class="fas fa-filter"></i>
+                    <button class="chip-ai" type="button" id="aiHelperBtn">
+                        <span class="icon">⚡</span>
+                        <span>AI Assistance</span>
                     </button>
                     <button class="btn-round" id="refreshBtn" title="Refresh Data">
                         <i class="fas fa-sync-alt"></i>
                     </button>
-                    <div class="avatar">AU</div>
+                    {% if missing_profile_fields %}
+                        <a href="{{ url_for('patients.complete_profile') }}" class="avatar-container">
+                            <div class="avatar">PH</div>
+                            <span class="profile-alert-dot">●</span>
+                        </a>
+                    {% else %}
+                        <div class="avatar-container">
+                            <div class="avatar">PH</div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             
@@ -253,7 +200,7 @@
     
   
 
-<script src="/static/js/a_feedback.js"></script>
+<script src="/static/scripts/a_feedback.js"></script>
 
 
 

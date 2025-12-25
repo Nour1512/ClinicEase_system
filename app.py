@@ -109,7 +109,7 @@ app.register_blueprint(invoice_bp)
 from controllers.patient_controller import patients_bp
 app.register_blueprint(patients_bp)
 
-from controllers.admin_controller import admin_feedback_bp
+from controllers.a_feedback_controller import admin_feedback_bp
 from controllers.doctor_controller import doctor_bp
 from controllers.notifications_controller import notification_bp
 app.register_blueprint(notification_bp)
@@ -117,8 +117,6 @@ app.register_blueprint(notification_bp)
 app.register_blueprint(admin_feedback_bp, url_prefix='/admin_feedbacks')
 app.register_blueprint(doctor_bp)
 
-from controllers.a_feedback_controller import feedback_bp
-app.register_blueprint(feedback_bp , url_prefix='/admin_feedbacks')
 
 from controllers.appointment_controller import appointment_bp
 
