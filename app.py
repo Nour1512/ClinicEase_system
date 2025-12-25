@@ -99,7 +99,7 @@ app.register_blueprint(password_reset_bp)
 from controllers.pharamcy_controler import pharmacy_bp
 app.register_blueprint(pharmacy_bp)
 app.register_blueprint(payment_bp, url_prefix='/')  # Add url_prefix if needed
-app.register_blueprint(service_bp , url_prefix='/services')
+app.register_blueprint(service_bp)
 from controllers.chatbot_controller import chatbot_bp
 app.register_blueprint(chatbot_bp)
 from controllers.invoice_details_controller import invoice_bp
