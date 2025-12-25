@@ -113,7 +113,7 @@
                     Feedback
                 </a>
             </li>
-            {% if patient_id %}
+                        <!-- {% if patient_id %}
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('patients_details.patient_details_page', patient_id=patient_id) }}">
                     <span class="icon">📝</span>
@@ -121,7 +121,14 @@
                 </a>
             </li>
             {% endif %}
-        {% endif %}
+        {% endif %} -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('patients_details.patient_details_page', patient_id=1) }}">
+                    <span class="icon">✍️</span>
+                    Patient Details
+                </a>
+            </li>
+
 
         <!-- Profile Completion (Patient Only) -->
         {% if current_role == "patient" and missing_profile_fields %}
