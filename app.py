@@ -100,7 +100,7 @@ app.register_blueprint(password_reset_bp)
 from controllers.pharamcy_controler import pharmacy_bp
 app.register_blueprint(pharmacy_bp)
 app.register_blueprint(payment_bp, url_prefix='/')  # Add url_prefix if needed
-app.register_blueprint(service_bp)
+app.register_blueprint(service_bp , url_prefix='/services')
 from controllers.chatbot_controller import chatbot_bp
 app.register_blueprint(chatbot_bp)
 from controllers.invoice_controller import invoice_bp
@@ -115,8 +115,11 @@ from controllers.doctor_controller import doctor_bp
 from controllers.notifications_controller import notification_bp
 app.register_blueprint(notification_bp)
 
-app.register_blueprint(admin_feedback_bp, url_prefix='/admin')
+app.register_blueprint(admin_feedback_bp, url_prefix='/admin_feedbacks')
 app.register_blueprint(doctor_bp)
+
+from controllers.a_feedback_controller import feedback_bp
+app.register_blueprint(feedback_bp , url_prefix='/admin_feedbacks')
 
 from controllers.appointment_controller import appointment_bp
 

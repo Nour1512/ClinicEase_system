@@ -5,34 +5,12 @@
     <title>Services Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/styles/style.css">
 </head>
 <body>
     <div class="app-shell">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">🏥</div>
-                <div>
-                    <div class="sidebar-title">Clinic Ease</div>
-                    <div class="sidebar-subtitle">Services Module</div>
-                </div>
-            </div>
-
-            <div class="sidebar-section-title">Main Menu</div>
-            <ul class="nav-list">
-                <li class="nav-item"><a class="nav-link" href="#"><span class="icon">📊</span>Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><span class="icon">👨‍⚕</span>Doctors</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><span class="icon">👤</span>Patients</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"><span class="icon">📅</span>Appointments</a></li>
-                <li class="nav-item"><a class="nav-link active" href="/service"><span class="icon">🩺</span>Services</a></li>
-            </ul>
-
-            <div class="sidebar-footer">
-                <div><strong>You Just Now Clinic</strong></div>
-                <div>Services v2.0</div>
-            </div>
-        </aside>
+        {% include 'base/sidebar.html' %}
 
         <!-- Main Content -->
         <main class="main">
@@ -49,6 +27,11 @@
                         <span class="icon">⚡</span>
                         <span>AI Assistance</span>
                     </button>
+                    <a href="{{ url_for('notifications.notifications_page') }}" 
+                        class="btn-round notification-bell" 
+                        style="text-decoration: none; display: inline-block; border: none; background: transparent; cursor: pointer; padding: 8px; border-radius: 50%; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 1.2rem; color: #f59e0b;">🔔</span>
+                    </a>
                     <div class="avatar-container">
                         <div class="avatar">AD</div>
                     </div>
@@ -158,6 +141,6 @@
         <div id="toastMessage"></div>
     </div>
 
-    <script src="/static/js/service.js"></script>
+    <script src="/static/scripts/service.js"></script>
 </body>
 </html>

@@ -22,30 +22,46 @@
     <div class="container">
 
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <h2 class="logo">finpay</h2>
-            <ul>
-                <li>Dashboard</li>
-                <li>Fund wallet</li>
-                <li>Cards & Bank</li>
-                <li>Transactions</li>
-                <li>Notifications</li>
-                <li class="active">Settings</li>
-                <li>Log out</li>
-            </ul>
-        </aside>
+        {% include 'base/sidebar.html' %}
 
         <!-- Main Content -->
         <main class="content">
 
             <!-- Top Bar -->
             <div class="topbar">
-                <input type="text" placeholder="Search...">
-                <div class="profile-info">
-                    <img src="profile.jpg" alt="">
-                    <span>Michael Nelson</span>
+        <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input id="searchInput" class="search-input" type="text"
+                   placeholder="Search medicines by name, ID or supplier..." />
+        </div>
+
+        <div class="topbar-actions">
+            <button class="chip-ai" type="button" id="aiHelperBtn">
+                <span class="icon">⚡</span>
+                <span>AI Assistance</span>
+            </button>
+            <!-- <button class="btn-round" type="button">🔔</button> -->
+            <a href="{{ url_for('notifications.notifications_page') }}" 
+                class="btn-round notification-bell" 
+                style="text-decoration: none; display: inline-block; border: none; background: transparent; cursor: pointer; padding: 8px; border-radius: 50%; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 1.2rem; color: #f59e0b;">🔔</span>
+            </a>
+
+            {% if missing_profile_fields %}
+                <a href="{{ url_for('patients.complete_profile') }}" class="avatar-container">
+                    <div class="avatar">PH</div>
+                    <span class="profile-alert-dot">●</span>
+                </a>
+            {% else %}
+                <div class="avatar-container">
+                    <div class="avatar">PH</div>
                 </div>
-            </div>
+            {% endif %}
+            <!-- <div class="avatar-container">
+                <div class="avatar">PH</div>
+            </div> -->
+        </div>
+    </div>
 
             <!-- Settings -->
             <div class="settings-card">

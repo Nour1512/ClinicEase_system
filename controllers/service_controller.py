@@ -10,7 +10,7 @@ def services_page():
     services = repo.get_all_services()
     total = repo.get_total_services()
     return render_template(
-        'service.html',
+        'service/service.html',
         services=services,
         total_services=total
     )

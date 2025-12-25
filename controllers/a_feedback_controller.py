@@ -1,8 +1,8 @@
 # controller/a_feedback_controller.py
 
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-from repositories.a_feedback_repositry import FeedbackRepository
-from models.a_feedback import Feedback
+from repositories.a_feedback_repositry import AdminFeedbackRepository
+from models.a_feedback import AdminFeedback
 
 
 feedback_bp = Blueprint('feedback', __name__, template_folder='../templates')
@@ -17,7 +17,7 @@ def list_feedback():
     search_query = request.args.get('search', '')
 
     
-    repo = FeedbackRepository()
+    repo = AdminFeedbackRepository()
     feedback_list = repo.get_all_feedback(
         status=status_filter,
         feedback_type=type_filter,
@@ -42,7 +42,7 @@ def list_feedback():
 
 @feedback_bp.route('/delete/<int:feedback_id>', methods=['POST'])
 def delete_feedback(feedback_id):
-    repo = FeedbackRepository()
+    repo = AdminFeedbackRepository()
     success = repo.delete_feedback(feedback_id)
     if success:
         return jsonify({'success': True, 'message': 'Feedback deleted successfully'})
@@ -52,7 +52,7 @@ def delete_feedback(feedback_id):
 @feedback_bp.route('/update-status/<int:feedback_id>', methods=['POST'])
 def update_feedback_status(feedback_id):
     new_status = request.form.get('status')
-    repo = FeedbackRepository()
+    repo = AdminFeedbackRepository()
     success = repo.update_feedback_status(feedback_id, new_status)
     if success:
         return jsonify({'success': True, 'message': f'Status updated to {new_status}'})
